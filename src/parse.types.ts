@@ -10,4 +10,14 @@ type MediaRule = RuleClone & {
   rules: StyleRuleClone[];
 };
 
-export { ParseCSSResult, MediaRule };
+type StyleBatch = {
+  width: number;
+  rules: StyleRuleClone[];
+  isMediaQuery: boolean;
+};
+
+type StyleBatchState = {
+  styleBatches: StyleBatch[];
+  currentStyleRuleBatch: StyleBatch | null;
+};
+export { ParseCSSResult, MediaRule, StyleBatch, StyleBatchState };
