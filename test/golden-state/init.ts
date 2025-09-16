@@ -1,6 +1,6 @@
 import { chromium } from "playwright";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +23,17 @@ const playwrightPages = await Promise.all(
       const cssPath = path.resolve(__dirname, htmlFilePath, css);
       await page.addStyleTag({ path: cssPath });
     }
+
+    // Inject the IIFE bundle and expose cloneDocument on window for tests
+    const clonerBundlePath = path.resolve(
+      __dirname,
+      "../../dist/cloner.bundle.js"
+    );
+    await page.addScriptTag({ path: clonerBundlePath });
+    await page.evaluate(() => {
+      // @ts-expect-error global from IIFE bundle
+      window.cloneDocument = window.FluidScale.cloneDocument;
+    });
 
     return page;
   })

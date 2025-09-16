@@ -7,21 +7,35 @@ import {
 import { STYLE_RULE_TYPE, MEDIA_RULE_TYPE } from "./parse";
 
 const FLUID_PROPERTY_NAMES = new Set<string>([
-  "fontSize",
-  "lineHeight",
-  "letterSpacing",
-  "wordSpacing",
-  "textIndent",
+  "font-size",
+  "line-height",
+  "letter-spacing",
+  "word-spacing",
+  "text-indent",
   "width",
-  "minWidth",
-  "maxWidth",
+  "min-width",
+  "max-width",
   "height",
-  "minHeight",
-  "maxHeight",
-  "gridTemplateColumns",
-  "gridTemplateRows",
-  "backgroundPositionX",
-  "backgroundPositionY",
+  "min-height",
+  "max-height",
+  "grid-template-columns",
+  "grid-template-rows",
+  "background-position-x",
+  "background-position-y",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
+  "border-top-left-radius",
+  "border-top-right-radius",
+  "border-bottom-right-radius",
+  "border-bottom-left-radius",
+  "column-gap",
+  "row-gap",
   "--fluid-bg-size",
   "top",
   "left",
@@ -36,37 +50,37 @@ const SHORTHAND_PROPERTIES: {
     [
       1,
       new Map([
-        [0, "padding-top"],
-        [0, "padding-right"],
-        [0, "padding-bottom"],
-        [0, "padding-left"],
+        [0, "paddingTop"],
+        [0, "paddingRight"],
+        [0, "paddingBottom"],
+        [0, "paddingLeft"],
       ]),
     ],
     [
       2,
       new Map([
-        [0, "padding-top"],
-        [1, "padding-right"],
-        [0, "padding-bottom"],
-        [1, "padding-left"],
+        [0, "paddingTop"],
+        [1, "paddingRight"],
+        [0, "paddingBottom"],
+        [1, "paddingLeft"],
       ]),
     ],
     [
       3,
       new Map([
-        [0, "padding-top"],
-        [1, "padding-right"],
-        [2, "padding-bottom"],
-        [1, "padding-left"],
+        [0, "paddingTop"],
+        [1, "paddingRight"],
+        [2, "paddingBottom"],
+        [1, "paddingLeft"],
       ]),
     ],
     [
       4,
       new Map([
-        [0, "padding-top"],
-        [1, "padding-right"],
-        [2, "padding-bottom"],
-        [3, "padding-left"],
+        [0, "paddingTop"],
+        [1, "paddingRight"],
+        [2, "paddingBottom"],
+        [3, "paddingLeft"],
       ]),
     ],
   ]),
@@ -74,37 +88,37 @@ const SHORTHAND_PROPERTIES: {
     [
       1,
       new Map([
-        [0, "margin-top"],
-        [0, "margin-right"],
-        [0, "margin-bottom"],
-        [0, "margin-left"],
+        [0, "marginTop"],
+        [0, "marginRight"],
+        [0, "marginBottom"],
+        [0, "marginLeft"],
       ]),
     ],
     [
       2,
       new Map([
-        [0, "margin-top"],
-        [1, "margin-right"],
-        [0, "margin-bottom"],
-        [1, "margin-left"],
+        [0, "marginTop"],
+        [1, "marginRight"],
+        [0, "marginBottom"],
+        [1, "marginLeft"],
       ]),
     ],
     [
       3,
       new Map([
-        [0, "margin-top"],
-        [1, "margin-right"],
-        [2, "margin-bottom"],
-        [1, "margin-left"],
+        [0, "marginTop"],
+        [1, "marginRight"],
+        [2, "marginBottom"],
+        [1, "marginLeft"],
       ]),
     ],
     [
       4,
       new Map([
-        [0, "margin-top"],
-        [1, "margin-right"],
-        [2, "margin-bottom"],
-        [3, "margin-left"],
+        [0, "marginTop"],
+        [1, "marginRight"],
+        [2, "marginBottom"],
+        [3, "marginLeft"],
       ]),
     ],
   ]),
@@ -112,37 +126,37 @@ const SHORTHAND_PROPERTIES: {
     [
       1,
       new Map([
-        [0, "border-top-left-radius"],
-        [0, "border-top-right-radius"],
-        [0, "border-bottom-right-radius"],
-        [0, "border-bottom-left-radius"],
+        [0, "borderTopLeftRadius"],
+        [0, "borderTopRightRadius"],
+        [0, "borderBottomRightRadius"],
+        [0, "borderBottomLeftRadius"],
       ]),
     ],
     [
       2,
       new Map([
-        [0, "border-top-left-radius"],
-        [1, "border-top-right-radius"],
-        [0, "border-bottom-right-radius"],
-        [1, "border-bottom-left-radius"],
+        [0, "borderTopLeftRadius"],
+        [1, "borderTopRightRadius"],
+        [0, "borderBottomRightRadius"],
+        [1, "borderBottomLeftRadius"],
       ]),
     ],
     [
       3,
       new Map([
-        [0, "border-top-left-radius"],
-        [1, "border-top-right-radius"],
-        [2, "border-bottom-right-radius"],
-        [1, "border-bottom-left-radius"],
+        [0, "borderTopLeftRadius"],
+        [1, "borderTopRightRadius"],
+        [2, "borderBottomRightRadius"],
+        [1, "borderBottomLeftRadius"],
       ]),
     ],
     [
       4,
       new Map([
-        [0, "border-top-left-radius"],
-        [1, "border-top-right-radius"],
-        [2, "border-bottom-right-radius"],
-        [3, "border-bottom-left-radius"],
+        [0, "borderTopLeftRadius"],
+        [1, "borderTopRightRadius"],
+        [2, "borderBottomRightRadius"],
+        [3, "borderBottomLeftRadius"],
       ]),
     ],
   ]),
@@ -155,7 +169,35 @@ const SHORTHAND_PROPERTIES: {
       ]),
     ],
   ]),
+  "background-position": new Map([
+    [
+      2,
+      new Map([
+        [0, "background-position-x"],
+        [0, "background-position-y"],
+      ]),
+    ],
+  ]),
 };
+
+const explicitProps = new Map<string, string>([
+  ["padding-top", "padding"],
+  ["padding-right", "padding"],
+  ["padding-bottom", "padding"],
+  ["padding-left", "padding"],
+  ["margin-top", "margin"],
+  ["margin-right", "margin"],
+  ["margin-bottom", "margin"],
+  ["margin-left", "margin"],
+  ["border-top-left-radius", "borderRadius"],
+  ["border-top-right-radius", "borderRadius"],
+  ["border-bottom-right-radius", "borderRadius"],
+  ["border-bottom-left-radius", "borderRadius"],
+  ["column-gap", "gap"],
+  ["row-gap", "gap"],
+  ["background-position-x", "background-position"],
+  ["background-position-y", "background-position"],
+]);
 
 function cloneDocument(doc: Document): DocumentClone {
   const docClone: DocumentClone = {
@@ -202,6 +244,13 @@ function filterAccessibleStyleSheets(
 function cloneStyleRule(styleRule: CSSStyleRule): StyleRuleClone {
   const style: Record<string, string> = {};
   for (const property of Array.from(styleRule.style)) {
+    if (explicitProps.has(property)) {
+      const shorthandValue = styleRule.style.getPropertyValue(
+        explicitProps.get(property) as string
+      );
+      if (shorthandValue) continue;
+    }
+
     const propertyValue = styleRule.style.getPropertyValue(property);
 
     if (SHORTHAND_PROPERTIES[property]) {

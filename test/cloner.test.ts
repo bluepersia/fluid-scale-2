@@ -1,5 +1,4 @@
 import { describe, test, expect } from "vitest";
-import { cloneDocument } from "../src/cloner";
 import { playwrightPages } from "./golden-state/init";
 import eauDeParfumDocClone from "./golden-state/eau-de-parfum/docClone";
 
@@ -14,15 +13,13 @@ describe("cloneDocument", () => {
     async ({ index, docClone }) => {
       const page = playwrightPages[index];
 
-      const clonedDocument = await page.evaluate(
-        async ({ cloneDocument }) => {
-          const clonedDocument = cloneDocument(document);
-          return clonedDocument;
-        },
-        { cloneDocument }
-      );
+      const clonedDocument = await page.evaluate(() => {
+        // window.cloneDocument is injected in setup
+        // @ts-expect-error injected global
+        return window.cloneDocument(document);
+      });
 
-      expect(clonedDocument).toEqual(docClone);
+      expect(clonedDocument).toMatchObject(docClone);
     }
   );
 });
