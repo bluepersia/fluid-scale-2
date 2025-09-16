@@ -56,6 +56,7 @@ const documentClone: DocumentClone = {
         {
           type: 4,
           minWidth: 375,
+          cssRules: [] as StyleRuleClone[],
         } as MediaRuleClone,
       ],
     },
