@@ -33,6 +33,8 @@ const playwrightPages = await Promise.all(
     await page.evaluate(() => {
       // @ts-expect-error global from IIFE bundle
       window.cloneDocument = window.FluidScale.cloneDocument;
+      // @ts-expect-error global from IIFE bundle
+      window.handleShorthand = window.FluidScale.handleShorthand;
     });
 
     return page;
