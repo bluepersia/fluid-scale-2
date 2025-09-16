@@ -122,6 +122,7 @@ function batchStyleRule(
   baselineWidth: number
 ): RuleBatchState {
   const newRuleBatchState: RuleBatchState = { ...ruleBatchState };
+  newRuleBatchState.ruleBatches = [...newRuleBatchState.ruleBatches];
 
   if (newRuleBatchState.currentRuleBatch === null) {
     newRuleBatchState.currentRuleBatch = {
@@ -129,20 +130,15 @@ function batchStyleRule(
       rules: [styleRule],
       isMediaQuery: false,
     };
-    newRuleBatchState.ruleBatches = [
-      ...newRuleBatchState.ruleBatches,
-      newRuleBatchState.currentRuleBatch,
-    ];
+    newRuleBatchState.ruleBatches.push(newRuleBatchState.currentRuleBatch);
   } else {
     const mutatedRuleBatch = {
       ...newRuleBatchState.currentRuleBatch,
       rules: [...newRuleBatchState.currentRuleBatch.rules, styleRule],
     };
     newRuleBatchState.currentRuleBatch = mutatedRuleBatch;
-    newRuleBatchState.ruleBatches = [
-      ...newRuleBatchState.ruleBatches.slice(0, -1),
-      mutatedRuleBatch,
-    ];
+    newRuleBatchState.ruleBatches[newRuleBatchState.ruleBatches.length - 1] =
+      mutatedRuleBatch;
   }
 
   return newRuleBatchState;
