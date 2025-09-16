@@ -63,7 +63,9 @@ function parseStyleSheet(
     globalBaselineWidth
   );
 
+  breakpoints.forEach(() => {});
   const ruleBatches = batchStyleSheet(styleSheet, baselineWidth);
+  ruleBatches.forEach(() => {});
 }
 
 function getStyleSheetBaselineWidth(
@@ -105,12 +107,11 @@ function batchRule(
       ruleBatchState,
       baselineWidth
     );
-  } else if (rule.type === MEDIA_RULE_TYPE) {
-    return batchMediaRule(
-      rule as MediaRuleClone,
-      ruleBatchState,
-      baselineWidth
-    );
+  } else if (
+    rule.type === MEDIA_RULE_TYPE &&
+    (rule as MediaRuleClone).cssRules.length > 0
+  ) {
+    return batchMediaRule(rule as MediaRuleClone, ruleBatchState);
   }
   return ruleBatchState;
 }
@@ -122,10 +123,22 @@ function batchStyleRule(
 ): RuleBatchState {
   const newRuleBatchState: RuleBatchState = { ...ruleBatchState };
 
-  if (newRuleBatchState.currentRuleBatch === null) {
+  if (newRuleBatchState.currentRuleBatch) {
+    newRuleBatchState.currentRuleBatch = {
+      ...newRuleBatchState.currentRuleBatch,
+      rules: [...newRuleBatchState.currentRuleBatch.rules, styleRule],
+    };
+    newRuleBatchState.ruleBatches = [
+      ...newRuleBatchState.ruleBatches.slice(
+        0,
+        newRuleBatchState.ruleBatches.length - 1
+      ),
+      newRuleBatchState.currentRuleBatch,
+    ];
+  } else {
     newRuleBatchState.currentRuleBatch = {
       width: baselineWidth,
-      rules: [],
+      rules: [styleRule],
       isMediaQuery: false,
     };
     newRuleBatchState.ruleBatches = [
@@ -133,24 +146,20 @@ function batchStyleRule(
       newRuleBatchState.currentRuleBatch,
     ];
   }
-  newRuleBatchState.currentRuleBatch = {
-    ...newRuleBatchState.currentRuleBatch,
-    rules: [...newRuleBatchState.currentRuleBatch.rules, styleRule],
-  };
+
   return newRuleBatchState;
 }
 
 function batchMediaRule(
   mediaRule: MediaRuleClone,
-  ruleBatchState: RuleBatchState,
-  baselineWidth: number
+  ruleBatchState: RuleBatchState
 ): RuleBatchState {
   const newRuleBatchState: RuleBatchState = { ...ruleBatchState };
   newRuleBatchState.currentRuleBatch = null;
   newRuleBatchState.ruleBatches = [
     ...newRuleBatchState.ruleBatches,
     {
-      width: baselineWidth,
+      width: mediaRule.minWidth,
       rules: mediaRule.cssRules,
       isMediaQuery: true,
     },
