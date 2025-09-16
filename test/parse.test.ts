@@ -1,6 +1,11 @@
 import { describe, test, expect } from "vitest";
-import { parseCSS, initDocument } from "../src/parse";
+import {
+  parseCSS,
+  initDocument,
+  getStyleSheetBaselineWidth,
+} from "../src/parse";
 import eauDeParfumDocClone from "./golden-state/eau-de-parfum/docClone";
+import { StylesheetClone } from "../src/cloner.types";
 
 const parseCSSTests = [
   {
@@ -28,6 +33,45 @@ describe("initDocument", () => {
     "should prepare the document",
     ({ docClone, expected }) => {
       const result = initDocument(docClone);
+      expect(result).toEqual(expected);
+    }
+  );
+});
+
+const stylesheetBaselineTests = [
+  {
+    styleSheet: eauDeParfumDocClone.stylesheets[0],
+    globalBaselineWidth: 375,
+    expected: 375,
+  },
+  {
+    styleSheet: eauDeParfumDocClone.stylesheets[2],
+    globalBaselineWidth: 375,
+    expected: 375,
+  },
+  {
+    styleSheet: {
+      cssRules: [
+        {
+          type: 4,
+          minWidth: 600,
+          cssRules: [],
+        },
+      ],
+    },
+    globalBaselineWidth: 375,
+    expected: 600,
+  },
+];
+
+describe("getStyleSheetBaselineWidth", () => {
+  test.each(stylesheetBaselineTests)(
+    "should get the style sheet baseline width",
+    ({ styleSheet, globalBaselineWidth, expected }) => {
+      const result = getStyleSheetBaselineWidth(
+        styleSheet as StylesheetClone,
+        globalBaselineWidth
+      );
       expect(result).toEqual(expected);
     }
   );
