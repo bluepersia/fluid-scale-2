@@ -1,7 +1,6 @@
 import {
   DocumentClone,
   StylesheetClone,
-  RuleClone,
   StyleRuleClone,
   MediaRuleClone,
 } from "./cloner.types";
@@ -48,6 +47,125 @@ const FLUID_PROPERTY_NAMES = new Set<string>([
   "rowGap",
 ]);
 
+const SHORTHAND_PROPERTIES: {
+  [shorthand: string]: Map<number, Map<number, string>>;
+} = {
+  padding: new Map([
+    [
+      1,
+      new Map([
+        [0, "padding-top"],
+        [0, "padding-right"],
+        [0, "padding-bottom"],
+        [0, "padding-left"],
+      ]),
+    ],
+    [
+      2,
+      new Map([
+        [0, "padding-top"],
+        [1, "padding-right"],
+        [0, "padding-bottom"],
+        [1, "padding-left"],
+      ]),
+    ],
+    [
+      3,
+      new Map([
+        [0, "padding-top"],
+        [1, "padding-right"],
+        [2, "padding-bottom"],
+        [1, "padding-left"],
+      ]),
+    ],
+    [
+      4,
+      new Map([
+        [0, "padding-top"],
+        [1, "padding-right"],
+        [2, "padding-bottom"],
+        [3, "padding-left"],
+      ]),
+    ],
+  ]),
+  margin: new Map([
+    [
+      1,
+      new Map([
+        [0, "margin-top"],
+        [0, "margin-right"],
+        [0, "margin-bottom"],
+        [0, "margin-left"],
+      ]),
+    ],
+    [
+      2,
+      new Map([
+        [0, "margin-top"],
+        [1, "margin-right"],
+        [0, "margin-bottom"],
+        [1, "margin-left"],
+      ]),
+    ],
+    [
+      3,
+      new Map([
+        [0, "margin-top"],
+        [1, "margin-right"],
+        [2, "margin-bottom"],
+        [1, "margin-left"],
+      ]),
+    ],
+    [
+      4,
+      new Map([
+        [0, "margin-top"],
+        [1, "margin-right"],
+        [2, "margin-bottom"],
+        [3, "margin-left"],
+      ]),
+    ],
+  ]),
+  borderRadius: new Map([
+    [
+      1,
+      new Map([
+        [0, "border-top-left-radius"],
+        [0, "border-top-right-radius"],
+        [0, "border-bottom-right-radius"],
+        [0, "border-bottom-left-radius"],
+      ]),
+    ],
+    [
+      2,
+      new Map([
+        [0, "border-top-left-radius"],
+        [1, "border-top-right-radius"],
+        [0, "border-bottom-right-radius"],
+        [1, "border-bottom-left-radius"],
+      ]),
+    ],
+    [
+      3,
+      new Map([
+        [0, "border-top-left-radius"],
+        [1, "border-top-right-radius"],
+        [2, "border-bottom-right-radius"],
+        [1, "border-bottom-left-radius"],
+      ]),
+    ],
+    [
+      4,
+      new Map([
+        [0, "border-top-left-radius"],
+        [1, "border-top-right-radius"],
+        [2, "border-bottom-right-radius"],
+        [3, "border-bottom-left-radius"],
+      ]),
+    ],
+  ]),
+};
+
 function cloneDocument(doc: Document): DocumentClone {
   const docClone: DocumentClone = {
     stylesheets: [],
@@ -80,9 +198,9 @@ function cloneStylesheet(stylesheet: CSSStyleSheet): StylesheetClone {
 function filterAccessibleStyleSheets(
   styleSheets: StyleSheetList
 ): CSSStyleSheet[] {
-  return Array.from(styleSheets).filter((stylesheet) => {
+  return Array.from(styleSheets).filter((styleSheet) => {
     try {
-      const rules = styleSheets.cssRules;
+      const rules = styleSheet.cssRules;
       return rules ? true : false;
     } catch (error) {
       return false;
@@ -93,8 +211,18 @@ function filterAccessibleStyleSheets(
 function cloneStyleRule(styleRule: CSSStyleRule): StyleRuleClone {
   const style: Record<string, string> = {};
   for (const property of Array.from(styleRule.style)) {
+    const propertyValue = styleRule.style.getPropertyValue(property);
+
+    if (SHORTHAND_PROPERTIES[property]) {
+      const shorthandStyle = handleShorthand(property, propertyValue);
+      for (const [key, value] of Object.entries(shorthandStyle)) {
+        style[key] = value;
+      }
+      continue;
+    }
+
     if (FLUID_PROPERTY_NAMES.has(property)) {
-      style[property] = styleRule.style.getPropertyValue(property);
+      style[property] = propertyValue;
     }
   }
   return {
@@ -103,6 +231,38 @@ function cloneStyleRule(styleRule: CSSStyleRule): StyleRuleClone {
     style,
     specialProperties: {},
   };
+}
+
+function handleShorthand(
+  property: string,
+  propertyValue: string
+): Record<string, string> {
+  const style: Record<string, string> = {};
+
+  let depth = 0;
+  const values: string[] = [];
+  let currentValue = "";
+  for (const char of propertyValue) {
+    if (char === "(") {
+      depth++;
+    } else if (char === ")") {
+      depth--;
+    } else if (char === " " && depth === 0) {
+      values.push(currentValue);
+      currentValue = "";
+    } else {
+      currentValue += char;
+    }
+  }
+  values.push(currentValue);
+
+  const explicitData = SHORTHAND_PROPERTIES[property].get(values.length);
+  if (explicitData) {
+    for (const [index, value] of explicitData.entries()) {
+      style[value] = values[index];
+    }
+  }
+  return style;
 }
 
 function cloneMediaRule(mediaRule: CSSMediaRule): MediaRuleClone | null {
@@ -119,3 +279,5 @@ function cloneMediaRule(mediaRule: CSSMediaRule): MediaRuleClone | null {
   }
   return null;
 }
+
+export { cloneDocument, cloneStylesheet, cloneStyleRule, cloneMediaRule };
