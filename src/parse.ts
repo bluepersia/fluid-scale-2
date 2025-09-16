@@ -123,19 +123,7 @@ function batchStyleRule(
 ): RuleBatchState {
   const newRuleBatchState: RuleBatchState = { ...ruleBatchState };
 
-  if (newRuleBatchState.currentRuleBatch) {
-    newRuleBatchState.currentRuleBatch = {
-      ...newRuleBatchState.currentRuleBatch,
-      rules: [...newRuleBatchState.currentRuleBatch.rules, styleRule],
-    };
-    newRuleBatchState.ruleBatches = [
-      ...newRuleBatchState.ruleBatches.slice(
-        0,
-        newRuleBatchState.ruleBatches.length - 1
-      ),
-      newRuleBatchState.currentRuleBatch,
-    ];
-  } else {
+  if (newRuleBatchState.currentRuleBatch === null) {
     newRuleBatchState.currentRuleBatch = {
       width: baselineWidth,
       rules: [styleRule],
@@ -144,6 +132,16 @@ function batchStyleRule(
     newRuleBatchState.ruleBatches = [
       ...newRuleBatchState.ruleBatches,
       newRuleBatchState.currentRuleBatch,
+    ];
+  } else {
+    const mutatedRuleBatch = {
+      ...newRuleBatchState.currentRuleBatch,
+      rules: [...newRuleBatchState.currentRuleBatch.rules, styleRule],
+    };
+    newRuleBatchState.currentRuleBatch = mutatedRuleBatch;
+    newRuleBatchState.ruleBatches = [
+      ...newRuleBatchState.ruleBatches.slice(0, -1),
+      mutatedRuleBatch,
     ];
   }
 
