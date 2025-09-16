@@ -12,22 +12,6 @@ const FLUID_PROPERTY_NAMES = new Set<string>([
   "letterSpacing",
   "wordSpacing",
   "textIndent",
-  "paddingTop",
-  "paddingRight",
-  "paddingBottom",
-  "paddingLeft",
-  "marginTop",
-  "marginRight",
-  "marginBottom",
-  "marginLeft",
-  "borderTopWidth",
-  "borderRightWidth",
-  "borderBottomWidth",
-  "borderLeftWidth",
-  "borderTopLeftRadius",
-  "borderTopRightRadius",
-  "borderBottomRightRadius",
-  "borderBottomLeftRadius",
   "width",
   "minWidth",
   "maxWidth",
@@ -43,8 +27,6 @@ const FLUID_PROPERTY_NAMES = new Set<string>([
   "left",
   "right",
   "bottom",
-  "columnGap",
-  "rowGap",
 ]);
 
 const SHORTHAND_PROPERTIES: {
@@ -161,6 +143,15 @@ const SHORTHAND_PROPERTIES: {
         [1, "border-top-right-radius"],
         [2, "border-bottom-right-radius"],
         [3, "border-bottom-left-radius"],
+      ]),
+    ],
+  ]),
+  gap: new Map([
+    [
+      1,
+      new Map([
+        [0, "columnGap"],
+        [0, "rowGap"],
       ]),
     ],
   ]),

@@ -4,7 +4,7 @@
   "description": "A JS fluid interpolation engine for CSS",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest --run --reporter verbose"
   },
   "repository": {
     "type": "git",
