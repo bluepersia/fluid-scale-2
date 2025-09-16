@@ -228,22 +228,37 @@ function cloneStyleRule(styleRule: CSSStyleRule): StyleRuleClone {
         const shorthandName = explicitProps.get(property) as string;
         let shorthand = shorthandCache.get(shorthandName);
         if (!shorthand) {
-          shorthand = handleShorthand(shorthandName, propertyValue);
+          shorthand = handleShorthand(
+            shorthandName,
+            styleRule.style.getPropertyValue(shorthandName)
+          );
           shorthandCache.set(shorthandName, shorthand);
         }
-        style[property] = shorthand[property];
+        style[property] = normalizeZero(shorthand[property]);
       }
       continue;
     }
 
-    style[property] = propertyValue;
+    style[property] = normalizeZero(propertyValue);
   }
   return {
     type: STYLE_RULE_TYPE,
-    selectorText: styleRule.selectorText,
+    selectorText: normalizeSelector(styleRule.selectorText),
     style,
     specialProperties: {},
   };
+}
+
+function normalizeSelector(selector: string): string {
+  return selector
+    .replace(/\*::(before|after)\b/g, "::$1")
+    .replace(/\s*,\s*/g, ", ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeZero(value: string): string {
+  return value === "0" ? "0px" : value;
 }
 
 function handleShorthand(

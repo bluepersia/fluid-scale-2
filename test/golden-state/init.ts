@@ -1,6 +1,7 @@
 import { chromium } from "playwright";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
+import { generateJSDOMDocument } from "../../src/json-builder";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,6 +12,11 @@ const realProjectsData = [
     addCss: ["css/global.css", "css/utils.css", "css/product-card.css"],
   },
 ];
+
+const JSDOMDocs = realProjectsData.map(({ htmlFilePath }) => {
+  const finalPath = path.resolve(__dirname, htmlFilePath, "index.html");
+  return generateJSDOMDocument([finalPath]);
+});
 
 const playwrightPages = await Promise.all(
   realProjectsData.map(async ({ htmlFilePath, addCss }) => {
@@ -41,4 +47,4 @@ const playwrightPages = await Promise.all(
   })
 );
 
-export { playwrightPages };
+export { playwrightPages, JSDOMDocs };
