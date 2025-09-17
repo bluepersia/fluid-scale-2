@@ -1,5 +1,5 @@
 import { describe, test, it, expect } from "vitest";
-import { JSDOMDocs, playwrightPages } from "./golden-state/init";
+import { realProjectsData, initPlaywrightPage } from "./golden-state/init";
 import eauDeParfumDocClone from "./golden-state/eau-de-parfum/docClone";
 import { cloneMediaRule, cloneStyleRule, handleShorthand } from "../src/cloner";
 import {
@@ -14,22 +14,30 @@ const docClones = [eauDeParfumDocClone].map((docClone, index) => ({
   docClone,
 }));
 
-describe("cloneDocument", () => {
-  test.each(docClones)(
-    "should clone the browser document",
-    async ({ index, docClone }) => {
-      const page = playwrightPages[index];
+describe(
+  "cloneDocument",
+  () => {
+    test.each(docClones)(
+      "should clone the browser document",
+      async ({ index, docClone }) => {
+        const { page, browser } = await initPlaywrightPage(
+          realProjectsData[index]
+        );
 
-      const clonedDocument = await page.evaluate(() => {
-        // window.cloneDocument is injected in setup
-        // @ts-expect-error injected global
-        return window.cloneDocument(document);
-      });
+        const clonedDocument = await page.evaluate(() => {
+          // window.cloneDocument is injected in setup
+          // @ts-expect-error injected global
+          return window.cloneDocument(document);
+        });
 
-      expect(clonedDocument).toMatchObject(docClone);
-    }
-  );
-});
+        expect(clonedDocument).toMatchObject(docClone);
+        await page.close();
+        await browser.close();
+      }
+    );
+  },
+  { timeout: 20000 }
+);
 
 const cloneStyleRuleTests = [...cloneStyleRuleTestsEauDeParfum];
 

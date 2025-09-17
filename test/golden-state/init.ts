@@ -18,33 +18,37 @@ const JSDOMDocs = realProjectsData.map(({ htmlFilePath }) => {
   return generateJSDOMDocument([finalPath]);
 });
 
-const playwrightPages = await Promise.all(
-  realProjectsData.map(async ({ htmlFilePath, addCss }) => {
-    const finalPath = path.resolve(__dirname, htmlFilePath, "index.html");
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
-    await page.goto(`file://${finalPath}`);
+async function initPlaywrightPage({
+  htmlFilePath,
+  addCss,
+}: {
+  htmlFilePath: string;
+  addCss: string[];
+}) {
+  const finalPath = path.resolve(__dirname, htmlFilePath, "index.html");
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.goto(`file://${finalPath}`);
 
-    for (const css of addCss) {
-      const cssPath = path.resolve(__dirname, htmlFilePath, css);
-      await page.addStyleTag({ path: cssPath });
-    }
+  for (const css of addCss) {
+    const cssPath = path.resolve(__dirname, htmlFilePath, css);
+    await page.addStyleTag({ path: cssPath });
+  }
 
-    // Inject the IIFE bundle and expose cloneDocument on window for tests
-    const clonerBundlePath = path.resolve(
-      __dirname,
-      "../../dist/cloner.bundle.js"
-    );
-    await page.addScriptTag({ path: clonerBundlePath });
-    await page.evaluate(() => {
-      // @ts-expect-error global from IIFE bundle
-      window.cloneDocument = window.FluidScale.cloneDocument;
-      // @ts-expect-error global from IIFE bundle
-      window.handleShorthand = window.FluidScale.handleShorthand;
-    });
+  // Inject the IIFE bundle and expose cloneDocument on window for tests
+  const clonerBundlePath = path.resolve(
+    __dirname,
+    "../../dist/cloner.bundle.js"
+  );
+  await page.addScriptTag({ path: clonerBundlePath });
+  await page.evaluate(() => {
+    // @ts-expect-error global from IIFE bundle
+    window.cloneDocument = window.FluidScale.cloneDocument;
+    // @ts-expect-error global from IIFE bundle
+    window.handleShorthand = window.FluidScale.handleShorthand;
+  });
 
-    return page;
-  })
-);
+  return { page, browser };
+}
 
-export { playwrightPages, JSDOMDocs };
+export { realProjectsData, JSDOMDocs, initPlaywrightPage };
