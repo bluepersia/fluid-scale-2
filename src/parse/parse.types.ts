@@ -1,5 +1,5 @@
 import { StyleRuleClone } from "./cloner.types";
-import { FluidData } from "./index.types";
+import { FluidData } from "../index.types";
 
 type CSSParseResult = {
   breakpoints: number[];

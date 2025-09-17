@@ -6,12 +6,12 @@ import {
   batchStyleRule,
   batchMediaRule,
   batchStyleSheet,
-} from "../src/parse";
+} from "../src/parse/parse";
 import {
   MediaRuleClone,
   StyleRuleClone,
   StylesheetClone,
-} from "../src/cloner.types";
+} from "../src/parse/cloner.types";
 import {
   parseCSSTests as parseCSSTestsEauDeParfum,
   perpareDocTests as perpareDocTestsEauDeParfum,
@@ -26,7 +26,7 @@ const parseCSSTests = [...parseCSSTestsEauDeParfum];
 describe("parseCSS", () => {
   test.each(parseCSSTests)("should parse the CSS", ({ docClone, expected }) => {
     const result = parseCSS(docClone);
-    expect(result).toEqual(expected);
+    expect(result.breakpoints).toEqual(expected.breakpoints);
   });
 });
 

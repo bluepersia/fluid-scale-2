@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
-import { generateJSDOMDocument } from "../../src/json-builder";
+import { generateJSDOMDocument } from "../../src/parse/json-builder";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,10 +36,7 @@ async function initPlaywrightPage({
   }
 
   // Inject the IIFE bundle and expose cloneDocument on window for tests
-  const clonerBundlePath = path.resolve(
-    __dirname,
-    "../../dist/cloner.bundle.js"
-  );
+  const clonerBundlePath = path.resolve(__dirname, "../../dist/bundle.js");
   await page.addScriptTag({ path: clonerBundlePath });
   await page.evaluate(() => {
     // @ts-expect-error global from IIFE bundle

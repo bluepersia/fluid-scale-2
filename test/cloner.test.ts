@@ -1,7 +1,11 @@
 import { describe, test, it, expect } from "vitest";
 import { realProjectsData, initPlaywrightPage } from "./golden-state/init";
 import eauDeParfumDocClone from "./golden-state/eau-de-parfum/docClone";
-import { cloneMediaRule, cloneStyleRule, handleShorthand } from "../src/cloner";
+import {
+  cloneMediaRule,
+  cloneStyleRule,
+  handleShorthand,
+} from "../src/parse/cloner";
 import {
   cloneStyleRuleTests as cloneStyleRuleTestsEauDeParfum,
   cloneMediaRuleTests as cloneMediaRuleTestsEauDeParfum,
