@@ -5,7 +5,14 @@ import {
   StyleRuleClone,
   StylesheetClone,
 } from "./cloner.types";
-import { CSSParseResult, RuleBatchState } from "./parse.types";
+import { FluidData } from "../index.types";
+import {
+  CSSParseResult,
+  DocStateResult,
+  RuleBatchState,
+  StyleSheetParseParams,
+} from "./parse.types";
+import { processRuleBatches } from "./patcher/patcher";
 
 const STYLE_RULE_TYPE = 1;
 const MEDIA_RULE_TYPE = 4;
@@ -13,10 +20,15 @@ const MEDIA_RULE_TYPE = 4;
 function parseCSS(docClone: DocumentClone): CSSParseResult {
   const { breakpoints, globalBaselineWidth } = initDocument(docClone);
 
-  parseStyleSheets(docClone, breakpoints, globalBaselineWidth);
+  const fluidData = parseStyleSheets(
+    docClone.stylesheets,
+    breakpoints,
+    globalBaselineWidth
+  );
 
   return {
     breakpoints,
+    fluidData,
   };
 }
 
@@ -44,28 +56,37 @@ function initDocument(docClone: DocumentClone): {
 }
 
 function parseStyleSheets(
-  docClone: DocumentClone,
+  styleSheets: StylesheetClone[],
   breakpoints: number[],
   globalBaselineWidth: number
-) {
-  for (const stylesheet of docClone.stylesheets) {
-    parseStyleSheet(stylesheet, breakpoints, globalBaselineWidth);
+): FluidData {
+  let fluidData: FluidData = {};
+  let order: number = 0;
+
+  for (const stylesheet of styleSheets) {
+    const { newFluidData, newOrder } = parseStyleSheet(stylesheet, {
+      breakpoints,
+      globalBaselineWidth,
+      fluidData,
+      order,
+    });
+    fluidData = { ...fluidData, ...newFluidData };
+    order = newOrder;
   }
+  return fluidData;
 }
 
 function parseStyleSheet(
   styleSheet: StylesheetClone,
-  breakpoints: number[],
-  globalBaselineWidth: number
-) {
+  params: StyleSheetParseParams
+): DocStateResult {
   const baselineWidth = getStyleSheetBaselineWidth(
     styleSheet,
-    globalBaselineWidth
+    params.globalBaselineWidth
   );
 
-  breakpoints.forEach(() => {});
   const ruleBatches = batchStyleSheet(styleSheet, baselineWidth);
-  ruleBatches.forEach(() => {});
+  return processRuleBatches({ ...params, ruleBatches });
 }
 
 function getStyleSheetBaselineWidth(
@@ -166,6 +187,8 @@ export {
   MEDIA_RULE_TYPE,
   parseCSS,
   initDocument,
+  parseStyleSheets,
+  parseStyleSheet,
   getStyleSheetBaselineWidth,
   batchStyleSheet,
   batchRule,

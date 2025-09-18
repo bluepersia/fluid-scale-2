@@ -241,11 +241,16 @@ function cloneStyleRule(styleRule: CSSStyleRule): StyleRuleClone {
 
     style[property] = normalizeZero(propertyValue);
   }
+  const specialProperties: Record<string, string> = {};
+
+  if (styleRule.style.getPropertyValue("--dynamic"))
+    specialProperties["--dynamic"] = "true";
+
   return {
     type: STYLE_RULE_TYPE,
     selectorText: normalizeSelector(styleRule.selectorText),
     style,
-    specialProperties: {},
+    specialProperties,
   };
 }
 

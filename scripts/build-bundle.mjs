@@ -1,12 +1,15 @@
 import { build } from "esbuild";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const entry = path.resolve(__dirname, "../src/cloner.ts");
-const outfile = path.resolve(__dirname, "../dist/cloner.bundle.js");
+const entry = path.resolve(__dirname, "../src/bundle.ts");
+const outfile = path.resolve(__dirname, "../dist/bundle.js");
+
+fs.rmSync(outfile, { force: true });
 
 await build({
   entryPoints: [entry],
