@@ -1,10 +1,7 @@
-import { describe, test, expect } from "vitest";
 import {
   MediaRuleClone,
   StyleRuleClone,
-  StylesheetClone,
 } from "../../../src/parse/cloner.types";
-import { parseStyleSheets } from "../../../src/parse/parse";
 import { RuleBatch } from "../../../src/parse/parse.types";
 import master from "./master";
 import { countStyleRules } from "../../utils";
@@ -20,7 +17,7 @@ const {
 const parseCSSTests = [
   {
     docClone: docClone,
-    expected: { breakpoints: [375, 600] },
+    expected: { breakpoints: [375, 600], fluidData },
   },
 ];
 

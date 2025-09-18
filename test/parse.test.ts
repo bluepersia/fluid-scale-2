@@ -30,7 +30,7 @@ const parseCSSTests = [...parseCSSTestsEauDeParfum];
 describe("parseCSS", () => {
   test.each(parseCSSTests)("should parse the CSS", ({ docClone, expected }) => {
     const result = parseCSS(docClone);
-    expect(result.breakpoints).toEqual(expected.breakpoints);
+    expect(result).toEqual(expected);
   });
 });
 

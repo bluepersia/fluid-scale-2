@@ -1,5 +1,5 @@
-import { FluidData, FluidRange, FluidValue } from "../index.types";
-import { StyleRuleClone } from "./cloner.types";
+import { FluidData, FluidRange } from "../../index.types";
+import { StyleRuleClone } from "../cloner.types";
 import {
   ApplyFluidRangeParams,
   DocStateResult,
@@ -9,7 +9,8 @@ import {
   RuleBatchesParams,
   RuleBatchParams,
   StyleRuleParams,
-} from "./parse.types";
+} from "../parse.types";
+import { parseFluidValue2D } from "./fluidValueParse";
 
 function processRuleBatches(params: RuleBatchesParams): DocStateResult {
   const { ruleBatches } = params;
@@ -197,60 +198,6 @@ function stripDynamicPseudos(selectorText: string): string {
       ""
     )
     .trim();
-}
-
-function parseFluidValue2D(value: string): FluidValue[][] {
-  let depth = 0;
-  let currentValue = "";
-  let values: FluidValue[][] = [];
-  for (const char of value) {
-    if (char === "(") {
-      depth++;
-    } else if (char === ")") {
-      depth--;
-    } else if (char === "," && depth === 0) {
-      values.push(parseFluidValue1D(currentValue));
-      currentValue = "";
-    } else {
-      currentValue += char;
-    }
-  }
-  values.push(parseFluidValue1D(currentValue));
-  return values;
-}
-
-function parseFluidValue1D(value: string): FluidValue[] {
-  let depth = 0;
-  let currentValue = "";
-  let values: FluidValue[] = [];
-
-  for (const char of value) {
-    if (char === "(") {
-      depth++;
-    } else if (char === ")") {
-      depth--;
-    } else if (char === " " && depth === 0) {
-      values.push(parseFluidValue(currentValue));
-      currentValue = "";
-    } else {
-      currentValue += char;
-    }
-  }
-  values.push(parseFluidValue(currentValue));
-  return values;
-}
-
-function parseFluidValue(strValue: string): FluidValue {
-  const value = parseFloat(strValue);
-
-  // Match any alphabetic characters after the number
-  const match = strValue.match(/[a-z%]+$/i);
-  const unit = match?.[0] || "px";
-
-  return {
-    value,
-    unit,
-  };
 }
 
 export {

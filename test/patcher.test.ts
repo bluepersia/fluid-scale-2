@@ -8,7 +8,7 @@ import {
   processRuleBatches,
   processStyleRule,
   splitSelectors,
-} from "../src/parse/patcher";
+} from "../src/parse/patcher/patcher";
 import {
   ruleBatchesTests as eauDeParfumRuleBatchesTests,
   ruleBatchTests as eauDeParfumRuleBatchTests,
