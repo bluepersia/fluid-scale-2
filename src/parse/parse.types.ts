@@ -38,31 +38,36 @@ type RuleBatchParams = Pick<
   ruleBatch: RuleBatch;
   batchIndex: number;
 };
+
+type StyleRuleParams = Pick<
+  RuleBatchParams,
+  "breakpoints" | "fluidData" | "ruleBatches" | "batchIndex" | "order"
+> & {
+  batchWidth: number;
+};
+
 type PropertyParams = Pick<
   RuleBatchParams,
-  | "breakpoints"
-  | "fluidData"
-  | "ruleBatches"
-  | "ruleBatch"
-  | "batchIndex"
-  | "order"
+  "breakpoints" | "fluidData" | "ruleBatches" | "batchIndex" | "order"
 > & {
+  isDynamic: boolean;
   property: string;
   minValue: string;
   selector: string;
+  batchWidth: number;
 };
 
 type MatchingRuleParams = Pick<
   PropertyParams,
   | "breakpoints"
   | "fluidData"
-  | "ruleBatches"
-  | "ruleBatch"
+  | "batchWidth"
   | "batchIndex"
   | "order"
   | "selector"
   | "property"
   | "minValue"
+  | "isDynamic"
 > & {
   maxValue: string;
   nextBatchWidth: number;
@@ -70,15 +75,12 @@ type MatchingRuleParams = Pick<
 
 type MakeFluidRangeParams = Pick<
   MatchingRuleParams,
-  "breakpoints" | "ruleBatch" | "minValue" | "maxValue" | "nextBatchWidth"
+  "breakpoints" | "batchWidth" | "minValue" | "maxValue" | "nextBatchWidth"
 >;
 type ApplyFluidRangeParams = Pick<
   PropertyParams,
-  "fluidData" | "selector" | "order"
-> & {
-  property: string;
-};
-
+  "fluidData" | "selector" | "order" | "isDynamic" | "property"
+>;
 type DocStateResult = {
   newFluidData: FluidData;
   newOrder: number;
@@ -96,4 +98,5 @@ export {
   ApplyFluidRangeParams,
   MatchingRuleParams,
   MakeFluidRangeParams,
+  StyleRuleParams,
 };

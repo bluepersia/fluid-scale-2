@@ -8,6 +8,7 @@ import {
   PropertyParams,
   RuleBatchesParams,
   RuleBatchParams,
+  StyleRuleParams,
 } from "./parse.types";
 
 function processRuleBatches(params: RuleBatchesParams): DocStateResult {
@@ -17,6 +18,8 @@ function processRuleBatches(params: RuleBatchesParams): DocStateResult {
   for (const [batchIndex, ruleBatch] of ruleBatches.entries()) {
     const { newFluidData, newOrder } = processRuleBatch({
       ...params,
+      fluidData,
+      order,
       batchIndex,
       ruleBatch,
     });
@@ -33,7 +36,12 @@ function processRuleBatch(params: RuleBatchParams): DocStateResult {
   const { ruleBatch } = params;
   let { fluidData, order } = params;
   for (const rule of ruleBatch.rules) {
-    const { newFluidData, newOrder } = processStyleRule(rule, params);
+    const { newFluidData, newOrder } = processStyleRule(rule, {
+      ...params,
+      fluidData,
+      order,
+      batchWidth: ruleBatch.width,
+    });
     fluidData = { ...fluidData, ...newFluidData };
     order = newOrder;
   }
@@ -45,17 +53,20 @@ function processRuleBatch(params: RuleBatchParams): DocStateResult {
 
 function processStyleRule(
   rule: StyleRuleClone,
-  params: RuleBatchParams
+  params: StyleRuleParams
 ): DocStateResult {
   let { fluidData, order } = params;
   const selectors = splitSelectors(rule.selectorText);
+  const isDynamic = rule.specialProperties["--dynamic"] === "true";
   for (const [property, minValue] of Object.entries(rule.style)) {
     for (const selector of selectors) {
-      const { newFluidData } = processProperty({
+      const newFluidData = processProperty({
         ...params,
+        fluidData,
         property,
         minValue,
         selector,
+        isDynamic,
       });
       fluidData = { ...fluidData, ...newFluidData };
     }
@@ -70,10 +81,8 @@ function splitSelectors(selectors: string): string[] {
   return selectors.split(",").map((selector) => selector.trim());
 }
 
-function processProperty(
-  params: PropertyParams
-): Pick<DocStateResult, "newFluidData"> {
-  const { ruleBatches, batchIndex, selector, property } = params;
+function processProperty(params: PropertyParams): FluidData {
+  const { ruleBatches, batchIndex, selector, property, minValue } = params;
   let { fluidData } = params;
 
   for (let i = batchIndex + 1; i < ruleBatches.length; i++) {
@@ -82,11 +91,13 @@ function processProperty(
       if (!splitSelectors(nextRule.selectorText).includes(selector)) continue;
 
       const maxValue = nextRule.style[property];
+      if (maxValue === minValue) continue;
       if (maxValue) {
         fluidData = {
           ...fluidData,
           ...processMatchingRule({
             ...params,
+            fluidData,
             maxValue,
             nextBatchWidth: nextRuleBatch.width,
           }),
@@ -94,9 +105,7 @@ function processProperty(
       }
     }
   }
-  return {
-    newFluidData: fluidData,
-  };
+  return fluidData;
 }
 
 function processMatchingRule(params: MatchingRuleParams): FluidData {
@@ -110,11 +119,12 @@ function processMatchingRule(params: MatchingRuleParams): FluidData {
 }
 
 function makeFluidRange(params: MakeFluidRangeParams): FluidRange {
-  const { minValue, maxValue, breakpoints, ruleBatch, nextBatchWidth } = params;
+  const { minValue, maxValue, breakpoints, batchWidth, nextBatchWidth } =
+    params;
   return {
     minValue: parseFluidValue2D(minValue),
     maxValue: parseFluidValue2D(maxValue),
-    minIndex: breakpoints.indexOf(ruleBatch.width),
+    minIndex: breakpoints.indexOf(batchWidth),
     maxIndex: breakpoints.indexOf(nextBatchWidth),
   };
 }
@@ -125,7 +135,11 @@ function applyFluidRange(
 ): FluidData {
   const { fluidData, selector, property, order } = params;
 
-  const baseSelector = stripModifiers(selector);
+  let isDynamic = hasDynamicPseudo(selector) || params.isDynamic;
+
+  const baseSelector = stripDynamicPseudos(
+    isDynamic ? stripClassModifiers(selector) : selector
+  );
   const selectorParts = baseSelector.split(" ");
   const anchor = selectorParts[selectorParts.length - 1];
   const newFluidData = {
@@ -159,20 +173,30 @@ function applyFluidRange(
   return newFluidData;
 }
 
-function stripModifiers(selectorText: string): string {
+function hasDynamicPseudo(selectorText: string): boolean {
+  return /:(hover|focus|active|visited|disabled|checked|focus-visible|focus-within)/.test(
+    selectorText
+  );
+}
+
+function stripClassModifiers(selectorText: string): string {
   return (
     selectorText
-      // remove BEM modifiers (anything starting with `--` until next non-name char)
+      // remove BEM modifiers (--something)
       .replace(/--[a-zA-Z0-9_-]+/g, "")
-      // remove chained modifiers like .mod
-      .replace(/\.[a-zA-Z0-9_-]+/g, "")
-      // remove common dynamic pseudos
-      .replace(
-        /:(hover|focus|active|visited|disabled|checked|focus-visible|focus-within)/g,
-        ""
-      )
+      // collapse chained classes: keep the first .class, drop the following .others
+      .replace(/(\.[a-zA-Z0-9_-]+)(?:\.[a-zA-Z0-9_-]+)+/g, "$1")
       .trim()
   );
+}
+
+function stripDynamicPseudos(selectorText: string): string {
+  return selectorText
+    .replace(
+      /:(hover|focus|active|visited|disabled|checked|focus-visible|focus-within)/g,
+      ""
+    )
+    .trim();
 }
 
 function parseFluidValue2D(value: string): FluidValue[][] {
@@ -220,7 +244,7 @@ function parseFluidValue(strValue: string): FluidValue {
   const value = parseFloat(strValue);
 
   // Match any alphabetic characters after the number
-  const match = String(value).match(/[a-z%]+$/i);
+  const match = strValue.match(/[a-z%]+$/i);
   const unit = match?.[0] || "px";
 
   return {
@@ -237,4 +261,7 @@ export {
   processMatchingRule,
   makeFluidRange,
   applyFluidRange,
+  splitSelectors,
+  stripClassModifiers,
+  stripDynamicPseudos,
 };

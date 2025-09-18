@@ -187,6 +187,8 @@ export {
   MEDIA_RULE_TYPE,
   parseCSS,
   initDocument,
+  parseStyleSheets,
+  parseStyleSheet,
   getStyleSheetBaselineWidth,
   batchStyleSheet,
   batchRule,

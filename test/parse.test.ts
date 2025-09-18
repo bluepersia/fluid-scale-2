@@ -6,6 +6,8 @@ import {
   batchStyleRule,
   batchMediaRule,
   batchStyleSheet,
+  parseStyleSheets,
+  parseStyleSheet,
 } from "../src/parse/parse";
 import {
   MediaRuleClone,
@@ -19,6 +21,8 @@ import {
   batchStyleRuleTest as batchStyleRuleTestEauDeParfum,
   batchMediaRuleTest as batchMediaRuleTestEauDeParfum,
   batchStyleSheetTest as batchStyleSheetTestEauDeParfum,
+  parseStyleSheetsTests as parseStyleSheetsTestsEauDeParfum,
+  parseStyleSheetTests as parseStyleSheetTestsEauDeParfum,
 } from "./golden-state/eau-de-parfum/parse";
 
 const parseCSSTests = [...parseCSSTestsEauDeParfum];
@@ -104,4 +108,41 @@ describe("batchStyleSheet", () => {
       expect(result).toEqual(expected);
     }
   );
+});
+
+const parseStyleSheetsTests = [parseStyleSheetsTestsEauDeParfum];
+
+describe("parseStyleSheets", () => {
+  test.each(parseStyleSheetsTests)(
+    "should parse the stylesheets",
+    ({ sheets, breakpoints, globalBaselineWidth, fluidData }) => {
+      const result = parseStyleSheets(sheets, breakpoints, globalBaselineWidth);
+
+      expect(fluidData).toMatchObject(result);
+    }
+  );
+});
+
+const parseStyleSheetTests = [...parseStyleSheetTestsEauDeParfum];
+
+describe("parseStyleSheet", () => {
+  test.each(parseStyleSheetTests)("should parse the stylesheet", (args) => {
+    const {
+      sheet,
+      fluidData,
+      nextOrder,
+      order,
+      breakpoints,
+      globalBaselineWidth,
+    } = args;
+    const { newFluidData, newOrder } = parseStyleSheet(sheet, {
+      order,
+      breakpoints,
+      globalBaselineWidth,
+      fluidData: {},
+    });
+
+    expect(fluidData).toMatchObject(newFluidData);
+    expect(nextOrder).toEqual(newOrder);
+  });
 });

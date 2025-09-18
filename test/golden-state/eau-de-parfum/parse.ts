@@ -1,29 +1,44 @@
-import eauDeParfumDocClone from "./docClone";
-import { MediaRuleClone, StyleRuleClone } from "../../../src/cloner.types";
-import { RuleBatch } from "../../../src/parse.types";
+import { describe, test, expect } from "vitest";
+import {
+  MediaRuleClone,
+  StyleRuleClone,
+  StylesheetClone,
+} from "../../../src/parse/cloner.types";
+import { parseStyleSheets } from "../../../src/parse/parse";
+import { RuleBatch } from "../../../src/parse/parse.types";
+import master from "./master";
+import { countStyleRules } from "../../utils";
+
+const {
+  docClone,
+  batchedStructure,
+  breakpoints,
+  globalBaselineWidth,
+  fluidData,
+} = master;
 
 const parseCSSTests = [
   {
-    docClone: eauDeParfumDocClone,
+    docClone: docClone,
     expected: { breakpoints: [375, 600] },
   },
 ];
 
 const perpareDocTests = [
   {
-    docClone: eauDeParfumDocClone,
+    docClone: docClone,
     expected: { breakpoints: [375, 600], globalBaselineWidth: 375 },
   },
 ];
 
 const stylesheetBaselineTests = [
   {
-    styleSheet: eauDeParfumDocClone.stylesheets[0],
+    styleSheet: docClone.stylesheets[0],
     globalBaselineWidth: 375,
     expected: 375,
   },
   {
-    styleSheet: eauDeParfumDocClone.stylesheets[2],
+    styleSheet: docClone.stylesheets[2],
     globalBaselineWidth: 375,
     expected: 375,
   },
@@ -44,25 +59,25 @@ const stylesheetBaselineTests = [
 
 const batchStyleRuleBatch1: RuleBatch = {
   width: 375,
-  rules: [eauDeParfumDocClone.stylesheets[0].cssRules[0] as StyleRuleClone],
+  rules: [docClone.stylesheets[0].cssRules[0] as StyleRuleClone],
   isMediaQuery: false,
 };
 const batchStyleRuleBatch2: RuleBatch = {
   width: 375,
-  rules: [eauDeParfumDocClone.stylesheets[0].cssRules[0] as StyleRuleClone],
+  rules: [docClone.stylesheets[0].cssRules[0] as StyleRuleClone],
   isMediaQuery: false,
 };
 const expectedStyleRuleBatch2: RuleBatch = {
   width: 375,
   rules: [
-    eauDeParfumDocClone.stylesheets[0].cssRules[0] as StyleRuleClone,
-    eauDeParfumDocClone.stylesheets[0].cssRules[1] as StyleRuleClone,
+    docClone.stylesheets[0].cssRules[0] as StyleRuleClone,
+    docClone.stylesheets[0].cssRules[1] as StyleRuleClone,
   ],
   isMediaQuery: false,
 };
 const batchStyleRuleTest = [
   {
-    styleRule: eauDeParfumDocClone.stylesheets[0].cssRules[0],
+    styleRule: docClone.stylesheets[0].cssRules[0],
     ruleBatchState: {
       ruleBatches: [],
       currentRuleBatch: null,
@@ -74,7 +89,7 @@ const batchStyleRuleTest = [
     },
   },
   {
-    styleRule: eauDeParfumDocClone.stylesheets[0].cssRules[1],
+    styleRule: docClone.stylesheets[0].cssRules[1],
     ruleBatchState: {
       ruleBatches: [batchStyleRuleBatch2],
       currentRuleBatch: batchStyleRuleBatch2,
@@ -88,13 +103,13 @@ const batchStyleRuleTest = [
 ];
 
 const batchMediaRuleTestRule2: MediaRuleClone =
-  eauDeParfumDocClone.stylesheets[2].cssRules.find(
+  docClone.stylesheets[2].cssRules.find(
     (rule) => rule.type === 4
   ) as MediaRuleClone;
 
 const batchMediaRuleTest = [
   {
-    mediaRule: eauDeParfumDocClone.stylesheets[0].cssRules.find(
+    mediaRule: docClone.stylesheets[0].cssRules.find(
       (rule) => rule.type === 4
     ) as MediaRuleClone,
     expected: {
@@ -123,45 +138,34 @@ const batchMediaRuleTest = [
   },
 ];
 
-const batchStyleSheetTest = [
-  {
-    styleSheet: eauDeParfumDocClone.stylesheets[0],
-    expected: [
-      {
-        width: 375,
-        rules: eauDeParfumDocClone.stylesheets[0].cssRules.slice(0, 5),
-        isMediaQuery: false,
-      },
-    ],
-  },
-  {
-    styleSheet: eauDeParfumDocClone.stylesheets[1],
-    expected: [
-      {
-        width: 375,
-        rules: [eauDeParfumDocClone.stylesheets[1].cssRules[0]],
-        isMediaQuery: false,
-      },
-    ],
-  },
-  {
-    styleSheet: eauDeParfumDocClone.stylesheets[2],
-    expected: [
-      {
-        width: 375,
-        rules: eauDeParfumDocClone.stylesheets[2].cssRules.slice(0, 13),
-        isMediaQuery: false,
-      },
-      {
-        width: 600,
-        rules: (
-          eauDeParfumDocClone.stylesheets[2].cssRules[13] as MediaRuleClone
-        ).cssRules,
-        isMediaQuery: true,
-      },
-    ],
-  },
-];
+const batchStyleSheetTest = docClone.stylesheets
+  .slice(0, 3)
+  .map((styleSheet, index) => ({
+    styleSheet,
+    expected: batchedStructure.styleSheets[index].batches,
+  }));
+
+const parseStyleSheetsTests = {
+  sheets: docClone.stylesheets,
+  breakpoints,
+  globalBaselineWidth,
+  fluidData,
+};
+
+let parseStyleSheetTestsOrder = 0;
+const parseStyleSheetTests = parseStyleSheetsTests.sheets.map((sheet) => {
+  const nextOrder = parseStyleSheetTestsOrder + countStyleRules(sheet.cssRules);
+  const testCase = {
+    sheet,
+    breakpoints: parseStyleSheetsTests.breakpoints,
+    globalBaselineWidth: parseStyleSheetsTests.globalBaselineWidth,
+    fluidData: parseStyleSheetsTests.fluidData,
+    order: parseStyleSheetTestsOrder,
+    nextOrder,
+  };
+  parseStyleSheetTestsOrder = nextOrder;
+  return testCase;
+});
 
 export {
   parseCSSTests,
@@ -170,4 +174,6 @@ export {
   batchStyleRuleTest,
   batchMediaRuleTest,
   batchStyleSheetTest,
+  parseStyleSheetsTests,
+  parseStyleSheetTests,
 };
