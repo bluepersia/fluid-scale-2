@@ -2,10 +2,10 @@ import {
   DocumentClone,
   MediaRuleClone,
   StyleRuleClone,
-} from "../../../src/parse/cloner.types";
+} from "../../../../src/parse/cloner.types";
 
 const documentClone: DocumentClone = {
-  stylesheets: [
+  styleSheets: [
     {
       cssRules: [
         {
@@ -224,7 +224,11 @@ const documentClone: DocumentClone = {
             {
               type: 1,
               selectorText: ".product-card__img--desktop",
-              style: { height: "100%" },
+              style: {
+                height: "100%",
+                "border-top-left-radius": "0.71rem",
+                "border-bottom-left-radius": "0.71rem",
+              },
               specialProperties: {},
             } as StyleRuleClone,
             {

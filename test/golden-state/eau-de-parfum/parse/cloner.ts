@@ -1,4 +1,4 @@
-import { JSDOMDocs } from "../init";
+import { JSDOMDocs } from "../../init";
 import eauDeParfumDocClone from "./docClone";
 
 const cloneStyleRuleTests = [
@@ -7,7 +7,7 @@ const cloneStyleRuleTests = [
     .map((rule, index) => {
       return {
         styleRule: rule as CSSStyleRule,
-        expected: eauDeParfumDocClone.stylesheets[0].cssRules[index],
+        expected: eauDeParfumDocClone.styleSheets[0].cssRules[index],
       };
     }),
 ];
@@ -17,7 +17,7 @@ const cloneMediaRuleTests = [
     mediaRule: Array.from(JSDOMDocs[0].styleSheets[0].cssRules).find(
       (rule) => rule.type === 4
     ) as CSSMediaRule,
-    expected: eauDeParfumDocClone.stylesheets[0].cssRules.find(
+    expected: eauDeParfumDocClone.styleSheets[0].cssRules.find(
       (rule) => rule.type === 4
     )!,
   },
@@ -25,7 +25,7 @@ const cloneMediaRuleTests = [
     mediaRule: Array.from(JSDOMDocs[0].styleSheets[2].cssRules).find(
       (rule) => rule.type === 4
     ) as CSSMediaRule,
-    expected: eauDeParfumDocClone.stylesheets[2].cssRules.find(
+    expected: eauDeParfumDocClone.styleSheets[2].cssRules.find(
       (rule) => rule.type === 4
     )!,
   },

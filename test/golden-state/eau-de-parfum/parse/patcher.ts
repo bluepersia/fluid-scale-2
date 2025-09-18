@@ -1,6 +1,6 @@
-import master from "./master";
-import { StyleRuleClone } from "../../../src/parse/cloner.types";
-import { FluidRange } from "../../../src/index.types";
+import master from "../master";
+import { StyleRuleClone } from "../../../../src/parse/cloner.types";
+import { FluidRange } from "../../../../src/index.types";
 import {
   ApplyFluidRangeParams,
   MakeFluidRangeParams,
@@ -8,8 +8,8 @@ import {
   PropertyParams,
   RuleBatchParams,
   StyleRuleParams,
-} from "../../../src/parse/parse.types";
-import { countStyleRules } from "../../utils";
+} from "../../../../src/parse/parse.types";
+import { countStyleRules } from "../../../utils";
 import { parseStyleSheetTests } from "./parse";
 
 const { batchedStructure, fluidData, breakpoints } = master;

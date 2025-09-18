@@ -21,7 +21,7 @@ function parseCSS(docClone: DocumentClone): CSSParseResult {
   const { breakpoints, globalBaselineWidth } = initDocument(docClone);
 
   const fluidData = parseStyleSheets(
-    docClone.stylesheets,
+    docClone.styleSheets,
     breakpoints,
     globalBaselineWidth
   );
@@ -39,8 +39,8 @@ function initDocument(docClone: DocumentClone): {
   let breakpointsSet: Set<number> = new Set();
   let globalBaselineWidth: number = 375;
 
-  for (const stylesheet of docClone.stylesheets) {
-    for (const rule of stylesheet.cssRules) {
+  for (const styleSheet of docClone.styleSheets) {
+    for (const rule of styleSheet.cssRules) {
       if (rule.type === MEDIA_RULE_TYPE) {
         const { minWidth, cssRules } = rule as MediaRuleClone;
         breakpointsSet.add(minWidth);
@@ -63,8 +63,8 @@ function parseStyleSheets(
   let fluidData: FluidData = {};
   let order: number = 0;
 
-  for (const stylesheet of styleSheets) {
-    const { newFluidData, newOrder } = parseStyleSheet(stylesheet, {
+  for (const styleSheet of styleSheets) {
+    const { newFluidData, newOrder } = parseStyleSheet(styleSheet, {
       breakpoints,
       globalBaselineWidth,
       fluidData,

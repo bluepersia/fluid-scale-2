@@ -1,17 +1,17 @@
 import { describe, test, it, expect } from "vitest";
-import { realProjectsData, initPlaywrightPage } from "./golden-state/init";
-import eauDeParfumDocClone from "./golden-state/eau-de-parfum/docClone";
+import { realProjectsData, initPlaywrightPage } from "../golden-state/init";
+import eauDeParfumDocClone from "../golden-state/eau-de-parfum/parse/docClone";
 import {
   cloneMediaRule,
   cloneStyleRule,
   handleShorthand,
-} from "../src/parse/cloner";
+} from "../../src/parse/cloner";
 import {
   cloneStyleRuleTests as cloneStyleRuleTestsEauDeParfum,
   cloneMediaRuleTests as cloneMediaRuleTestsEauDeParfum,
   cloneMediaRuleUnitTests as cloneMediaRuleUnitTestsEauDeParfum,
   shortHandTests as shortHandTestsEauDeParfum,
-} from "./golden-state/eau-de-parfum/cloner";
+} from "../golden-state/eau-de-parfum/parse/cloner";
 
 const docClones = [eauDeParfumDocClone].map((docClone, index) => ({
   index,
@@ -34,7 +34,7 @@ describe(
           return window.cloneDocument(document);
         });
 
-        expect(clonedDocument).toMatchObject(docClone);
+        expect(clonedDocument).toEqual(docClone);
         await page.close();
         await browser.close();
       }

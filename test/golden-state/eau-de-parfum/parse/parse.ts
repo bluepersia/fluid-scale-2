@@ -1,10 +1,10 @@
 import {
   MediaRuleClone,
   StyleRuleClone,
-} from "../../../src/parse/cloner.types";
-import { RuleBatch } from "../../../src/parse/parse.types";
-import master from "./master";
-import { countStyleRules } from "../../utils";
+} from "../../../../src/parse/cloner.types";
+import { RuleBatch } from "../../../../src/parse/parse.types";
+import master from "../master";
+import { countStyleRules } from "../../../utils";
 
 const {
   docClone,
@@ -30,12 +30,12 @@ const perpareDocTests = [
 
 const stylesheetBaselineTests = [
   {
-    styleSheet: docClone.stylesheets[0],
+    styleSheet: docClone.styleSheets[0],
     globalBaselineWidth: 375,
     expected: 375,
   },
   {
-    styleSheet: docClone.stylesheets[2],
+    styleSheet: docClone.styleSheets[2],
     globalBaselineWidth: 375,
     expected: 375,
   },
@@ -56,25 +56,25 @@ const stylesheetBaselineTests = [
 
 const batchStyleRuleBatch1: RuleBatch = {
   width: 375,
-  rules: [docClone.stylesheets[0].cssRules[0] as StyleRuleClone],
+  rules: [docClone.styleSheets[0].cssRules[0] as StyleRuleClone],
   isMediaQuery: false,
 };
 const batchStyleRuleBatch2: RuleBatch = {
   width: 375,
-  rules: [docClone.stylesheets[0].cssRules[0] as StyleRuleClone],
+  rules: [docClone.styleSheets[0].cssRules[0] as StyleRuleClone],
   isMediaQuery: false,
 };
 const expectedStyleRuleBatch2: RuleBatch = {
   width: 375,
   rules: [
-    docClone.stylesheets[0].cssRules[0] as StyleRuleClone,
-    docClone.stylesheets[0].cssRules[1] as StyleRuleClone,
+    docClone.styleSheets[0].cssRules[0] as StyleRuleClone,
+    docClone.styleSheets[0].cssRules[1] as StyleRuleClone,
   ],
   isMediaQuery: false,
 };
 const batchStyleRuleTest = [
   {
-    styleRule: docClone.stylesheets[0].cssRules[0],
+    styleRule: docClone.styleSheets[0].cssRules[0],
     ruleBatchState: {
       ruleBatches: [],
       currentRuleBatch: null,
@@ -86,7 +86,7 @@ const batchStyleRuleTest = [
     },
   },
   {
-    styleRule: docClone.stylesheets[0].cssRules[1],
+    styleRule: docClone.styleSheets[0].cssRules[1],
     ruleBatchState: {
       ruleBatches: [batchStyleRuleBatch2],
       currentRuleBatch: batchStyleRuleBatch2,
@@ -100,13 +100,13 @@ const batchStyleRuleTest = [
 ];
 
 const batchMediaRuleTestRule2: MediaRuleClone =
-  docClone.stylesheets[2].cssRules.find(
+  docClone.styleSheets[2].cssRules.find(
     (rule) => rule.type === 4
   ) as MediaRuleClone;
 
 const batchMediaRuleTest = [
   {
-    mediaRule: docClone.stylesheets[0].cssRules.find(
+    mediaRule: docClone.styleSheets[0].cssRules.find(
       (rule) => rule.type === 4
     ) as MediaRuleClone,
     expected: {
@@ -135,7 +135,7 @@ const batchMediaRuleTest = [
   },
 ];
 
-const batchStyleSheetTest = docClone.stylesheets
+const batchStyleSheetTest = docClone.styleSheets
   .slice(0, 3)
   .map((styleSheet, index) => ({
     styleSheet,
@@ -143,7 +143,7 @@ const batchStyleSheetTest = docClone.stylesheets
   }));
 
 const parseStyleSheetsTests = {
-  sheets: docClone.stylesheets,
+  sheets: docClone.styleSheets,
   breakpoints,
   globalBaselineWidth,
   fluidData,

@@ -1,5 +1,8 @@
 import { describe, it, test, expect } from "vitest";
-import { generateJSDOMDocument, resolvePath } from "../src/parse/json-builder";
+import {
+  generateJSDOMDocument,
+  resolvePath,
+} from "../../src/parse/json-builder";
 import path from "path";
 
 const resolvePathTests = [

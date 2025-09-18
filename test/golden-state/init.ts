@@ -6,7 +6,12 @@ import { generateJSDOMDocument } from "../../src/parse/json-builder";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const realProjectsData = [
+type PlaywrightBlueprint = {
+  htmlFilePath: string;
+  addCss: string[];
+};
+
+const realProjectsData: PlaywrightBlueprint[] = [
   {
     htmlFilePath: "eau-de-parfum",
     addCss: ["css/global.css", "css/utils.css", "css/product-card.css"],
@@ -41,11 +46,35 @@ async function initPlaywrightPage({
   await page.evaluate(() => {
     // @ts-expect-error global from IIFE bundle
     window.cloneDocument = window.FluidScale.cloneDocument;
+
     // @ts-expect-error global from IIFE bundle
-    window.handleShorthand = window.FluidScale.handleShorthand;
+    window.addElements = window.FluidScale.addElements;
+
+    // @ts-expect-error global from IIFE bundle
+    window.getAllEls = window.FluidScale.getAllEls;
+
+    // @ts-expect-error global from IIFE bundle
+    window.makeFluidPropertiesFromAnchor =
+      window.FluidScale.makeFluidPropertiesFromAnchor;
+
+    // @ts-expect-error global from IIFE bundle
+    window.makeExpectedDocStructure =
+      window.FluidScale.makeExpectedDocStructure;
+
+    // @ts-expect-error global from IIFE bundle
+    window.addElementsIndex = window.FluidScale.addElementsIndex;
+
+    // @ts-expect-error global from IIFE bundle
+    window.getState = window.FluidScale.getState;
+
+    // @ts-expect-error global from IIFE bundle
+    window.initEngineState = window.FluidScale.initEngineState;
+
+    // @ts-expect-error global from IIFE bundle
+    window.init = window.FluidScale.init;
   });
 
   return { page, browser };
 }
 
-export { realProjectsData, JSDOMDocs, initPlaywrightPage };
+export { realProjectsData, JSDOMDocs, initPlaywrightPage, PlaywrightBlueprint };

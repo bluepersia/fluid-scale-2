@@ -1,16 +1,17 @@
 import {
   MediaRuleClone,
   StyleRuleClone,
-} from "../../../src/parse/cloner.types";
+} from "../../../../src/parse/cloner.types";
+import { BatchedStructure } from "../../../parse/index.types";
 import docClone from "./docClone";
 
-const batchedStructure = {
+const batchedStructure: BatchedStructure = {
   styleSheets: [
     {
       batches: [
         {
           width: 375,
-          rules: docClone.stylesheets[0].cssRules.slice(
+          rules: docClone.styleSheets[0].cssRules.slice(
             0,
             5
           ) as StyleRuleClone[],
@@ -22,7 +23,7 @@ const batchedStructure = {
       batches: [
         {
           width: 375,
-          rules: [docClone.stylesheets[1].cssRules[0]] as StyleRuleClone[],
+          rules: [docClone.styleSheets[1].cssRules[0]] as StyleRuleClone[],
           isMediaQuery: false,
         },
       ],
@@ -31,7 +32,7 @@ const batchedStructure = {
       batches: [
         {
           width: 375,
-          rules: docClone.stylesheets[2].cssRules.slice(
+          rules: docClone.styleSheets[2].cssRules.slice(
             0,
             13
           ) as StyleRuleClone[],
@@ -39,7 +40,7 @@ const batchedStructure = {
         },
         {
           width: 600,
-          rules: (docClone.stylesheets[2].cssRules[13] as MediaRuleClone)
+          rules: (docClone.styleSheets[2].cssRules[13] as MediaRuleClone)
             .cssRules as StyleRuleClone[],
           isMediaQuery: true,
         },
@@ -48,4 +49,4 @@ const batchedStructure = {
   ],
 };
 
-export default batchedStructure;
+export { batchedStructure, BatchedStructure };

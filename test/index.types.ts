@@ -1,41 +1,22 @@
-import { FluidPropertyMetaData, FluidRange } from "../src/index.types";
-import { StyleRuleClone } from "../src/parse/cloner.types";
-import { RuleBatch } from "../src/parse/parse.types";
+import { FluidData } from "../src/index.types";
+import { DocumentClone, StyleRuleClone } from "../src/parse/cloner.types";
+import {
+  DocStructure,
+  MakeFluidPropertiesDoc,
+} from "./golden-state/engine/index.types";
+import { PlaywrightBlueprint } from "./golden-state/init";
+import { BatchedStructure } from "./parse/index.types";
 
-type ParseResultExpectation = {
-  ruleBatches: RuleBatch[];
+type Master = {
+  docClone: DocumentClone;
   breakpoints: number[];
-  batchWidth: number;
-  nextBatchWidth: number;
-  batchIndex: number;
-  rule: StyleRuleClone;
-  selector: string;
-  baseSelector: string;
-  anchor: string;
-  isDynamic: boolean;
-  property: string;
-  minValue: string;
-  metaData: FluidPropertyMetaData;
+  globalBaselineWidth: number;
+  batchedStructure: BatchedStructure;
+  fluidData: FluidData;
+  playwrightBlueprint: PlaywrightBlueprint;
+  engineDoc: DocStructure;
+  allIdsEngine: string[];
+  makeFluidPropertiesDoc: MakeFluidPropertiesDoc;
 };
 
-type MatchingParseResultExpectation = ParseResultExpectation & {
-  range: FluidRange;
-  maxValue: string;
-};
-
-type BatchedExpectation = {
-  rule: StyleRuleClone;
-  order: number;
-  breakpoints: number[];
-  ruleBatches: RuleBatch[];
-  batchIndex: number;
-  data: ParseResultExpectation[];
-  batchWidth: number;
-  nextBatchWidth: number;
-};
-
-export {
-  ParseResultExpectation,
-  MatchingParseResultExpectation,
-  BatchedExpectation,
-};
+export { Master };
