@@ -1,10 +1,10 @@
+import { Browser, Page } from "playwright";
 import { FluidData } from "../src/index.types";
-import { DocumentClone, StyleRuleClone } from "../src/parse/cloner.types";
+import { DocumentClone } from "../src/parse/cloner.types";
 import {
   DocStructure,
   MakeFluidPropertiesDoc,
-} from "./golden-state/engine/index.types";
-import { PlaywrightBlueprint } from "./golden-state/init";
+} from "./golden-state/runtime/engine/index.types";
 import { BatchedStructure } from "./parse/index.types";
 
 type Master = {
@@ -13,9 +13,8 @@ type Master = {
   globalBaselineWidth: number;
   batchedStructure: BatchedStructure;
   fluidData: FluidData;
-  playwrightBlueprint: PlaywrightBlueprint;
+  index: number;
   engineDoc: DocStructure;
-  allIdsEngine: string[];
   makeFluidPropertiesDoc: MakeFluidPropertiesDoc;
 };
 

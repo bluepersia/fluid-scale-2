@@ -5,6 +5,10 @@ import {
 import { RuleBatch } from "../../../../src/parse/parse.types";
 import master from "../master";
 import { countStyleRules } from "../../../utils";
+import {
+  makeParseStyleSheetsTest,
+  makeParseStyleSheetTests,
+} from "../../../parse/parse";
 
 const {
   docClone,
@@ -142,27 +146,9 @@ const batchStyleSheetTest = docClone.styleSheets
     expected: batchedStructure.styleSheets[index].batches,
   }));
 
-const parseStyleSheetsTests = {
-  sheets: docClone.styleSheets,
-  breakpoints,
-  globalBaselineWidth,
-  fluidData,
-};
+const parseStyleSheetsTests = makeParseStyleSheetsTest(master);
 
-let parseStyleSheetTestsOrder = 0;
-const parseStyleSheetTests = parseStyleSheetsTests.sheets.map((sheet) => {
-  const nextOrder = parseStyleSheetTestsOrder + countStyleRules(sheet.cssRules);
-  const testCase = {
-    sheet,
-    breakpoints: parseStyleSheetsTests.breakpoints,
-    globalBaselineWidth: parseStyleSheetsTests.globalBaselineWidth,
-    fluidData: parseStyleSheetsTests.fluidData,
-    order: parseStyleSheetTestsOrder,
-    nextOrder,
-  };
-  parseStyleSheetTestsOrder = nextOrder;
-  return testCase;
-});
+const parseStyleSheetTests = makeParseStyleSheetTests(parseStyleSheetsTests);
 
 export {
   parseCSSTests,

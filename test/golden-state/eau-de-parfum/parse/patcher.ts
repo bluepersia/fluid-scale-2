@@ -1,124 +1,39 @@
 import master from "../master";
-import { StyleRuleClone } from "../../../../src/parse/cloner.types";
 import { FluidRange } from "../../../../src/index.types";
-import {
-  ApplyFluidRangeParams,
-  MakeFluidRangeParams,
-  MatchingRuleParams,
-  PropertyParams,
-  RuleBatchParams,
-  StyleRuleParams,
-} from "../../../../src/parse/parse.types";
 import { countStyleRules } from "../../../utils";
 import { parseStyleSheetTests } from "./parse";
+import {
+  RuleBatchTestCase,
+  StyleRuleTestCase,
+  ProcessPropertyTestCase,
+  MatchingRuleTestCase,
+  FluidRangeTestCase,
+  ApplyFluidRangeTestCase,
+  MaxValueMap,
+} from "../../../parse/index.types";
+import {
+  makeApplyFluidRangeTests,
+  makeMakeFluidRangeTests,
+  makeMatchingRuleTests,
+  makeProcessPropertyTests,
+  makeRuleBatchesTests,
+  makeRuleBatchTests,
+  makeStyleRuleTests,
+} from "../../../parse/patcher";
 
-const { batchedStructure, fluidData, breakpoints } = master;
+const { fluidData, breakpoints } = master;
 
-const ruleBatchesTests = parseStyleSheetTests.map((testCase, sheetIndex) => {
-  return {
-    ruleBatches: batchedStructure.styleSheets[sheetIndex].batches,
-    order: testCase.order,
-    nextOrder: testCase.nextOrder,
-    breakpoints,
-    fluidData,
-  };
-});
+const ruleBatchesTests = makeRuleBatchesTests(parseStyleSheetTests);
 
-type RuleBatchTestCase = RuleBatchParams & {
-  nextOrder: number;
-};
+const ruleBatchTests: RuleBatchTestCase[] =
+  makeRuleBatchTests(ruleBatchesTests);
 
-const ruleBatchTests: RuleBatchTestCase[] = [];
-for (const testCase of ruleBatchesTests) {
-  let order = testCase.order;
-  ruleBatchTests.push(
-    ...testCase.ruleBatches.map((ruleBatch, batchIndex) => {
-      const nextOrder = order + countStyleRules(ruleBatch.rules);
-      const batchTestCase = {
-        order,
-        nextOrder,
-        ruleBatch,
-        ruleBatches: testCase.ruleBatches,
-        batchIndex,
-        breakpoints,
-        fluidData,
-      };
-      order = nextOrder;
-      return batchTestCase;
-    })
-  );
-}
+const styleRuleTests: StyleRuleTestCase[] = makeStyleRuleTests(ruleBatchTests);
 
-type StyleRuleTestCase = StyleRuleParams & {
-  rule: StyleRuleClone;
-  nextOrder: number;
-};
+const propertyTests: ProcessPropertyTestCase[] =
+  makeProcessPropertyTests(styleRuleTests);
 
-const styleRuleTests: StyleRuleTestCase[] = [];
-
-for (const testCase of ruleBatchTests) {
-  let order = testCase.order;
-  styleRuleTests.push(
-    ...testCase.ruleBatch.rules.map((rule) => {
-      const nextOrder = order + 1;
-
-      const styleRuleTestCase = {
-        order,
-        nextOrder,
-        rule,
-        ruleBatches: testCase.ruleBatches,
-        batchIndex: testCase.batchIndex,
-        batchWidth: testCase.ruleBatch.width,
-        breakpoints,
-        fluidData,
-      };
-      order = nextOrder;
-      return styleRuleTestCase;
-    })
-  );
-}
-
-type ProcessPropertyTestCase = PropertyParams & {
-  rule: StyleRuleClone;
-};
-
-const propertyTests: ProcessPropertyTestCase[] = [];
-
-for (const testCase of styleRuleTests) {
-  const { rule } = testCase;
-  const selectors = rule.selectorText.split(",").map((sel) => sel.trim());
-
-  for (const selector of selectors) {
-    for (const [property, minValue] of Object.entries(rule.style)) {
-      propertyTests.push({
-        ...testCase,
-        minValue,
-        breakpoints,
-        fluidData,
-        isDynamic: rule.specialProperties["--dynamic"] !== undefined,
-        property,
-        selector,
-      });
-    }
-  }
-}
-
-function makeRuleKey({
-  selector,
-  property,
-  batchIndex,
-}: {
-  selector: string;
-  property: string;
-  batchIndex: number;
-}): string {
-  return `${selector}/${property}/${batchIndex}`;
-}
-
-const maxValueMap: Map<
-  string,
-  Pick<MatchingRuleParams, "maxValue" | "nextBatchWidth">
-> = new Map([
+const maxValueMap: MaxValueMap = new Map([
   [
     ".product-card/max-width/0",
     {
@@ -183,22 +98,11 @@ const maxValueMap: Map<
     },
   ],
 ]);
-type MatchingRuleTestCase = MatchingRuleParams;
 
-const matchingRuleTests: MatchingRuleTestCase[] = [];
-
-for (const testCase of propertyTests) {
-  const key = makeRuleKey(testCase);
-
-  if (maxValueMap.has(key)) {
-    const maxValueData = maxValueMap.get(key)!;
-
-    matchingRuleTests.push({
-      ...testCase,
-      ...maxValueData,
-    });
-  }
-}
+const matchingRuleTests: MatchingRuleTestCase[] = makeMatchingRuleTests(
+  propertyTests,
+  maxValueMap
+);
 
 const fluidRangeMap: Map<string, FluidRange> = new Map([
   [
@@ -284,30 +188,13 @@ const fluidRangeMap: Map<string, FluidRange> = new Map([
   ],
 ]);
 
-type FluidRangeTestCase = MakeFluidRangeParams & {
-  range: FluidRange;
-};
-const makeFluidRangeTests: FluidRangeTestCase[] = [];
+const makeFluidRangeTests: FluidRangeTestCase[] = makeMakeFluidRangeTests(
+  matchingRuleTests,
+  fluidRangeMap
+);
 
-for (const testCase of matchingRuleTests) {
-  const key = makeRuleKey(testCase);
-
-  if (fluidRangeMap.has(key)) {
-    makeFluidRangeTests.push({ ...testCase, range: fluidRangeMap.get(key)! });
-  }
-}
-
-type ApplyFluidRangeTestCase = ApplyFluidRangeParams & {
-  range: FluidRange;
-};
-const applyFluidRangeTests: ApplyFluidRangeTestCase[] = [];
-
-for (const testCase of matchingRuleTests) {
-  const key = makeRuleKey(testCase);
-
-  if (fluidRangeMap.has(key))
-    applyFluidRangeTests.push({ ...testCase, range: fluidRangeMap.get(key)! });
-}
+const applyFluidRangeTests: ApplyFluidRangeTestCase[] =
+  makeApplyFluidRangeTests(matchingRuleTests, fluidRangeMap);
 
 export {
   ruleBatchesTests,

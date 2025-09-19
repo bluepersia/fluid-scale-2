@@ -1,46 +1,41 @@
 import { describe, test, expect } from "vitest";
-import { init } from "../src/index";
 import eauDeParfumMaster from "./golden-state/eau-de-parfum/master";
-import { initPlaywrightPage } from "./golden-state/init";
+import { playwrightPages } from "./golden-state/vitest.init";
 
 const masters = [eauDeParfumMaster];
 
 describe("init", () => {
-  test.each(masters)(
-    "should init the engine",
-    async ({ playwrightBlueprint, engineDoc }) => {
-      const { page, browser } = await initPlaywrightPage(playwrightBlueprint);
+  test.each(masters)("should init the engine", async ({ engineDoc, index }) => {
+    const { page } = (await playwrightPages)[index];
+    const result = await page.evaluate(() => {
+      // @ts-expect-error injected global
+      window.resetState();
 
-      const result = await page.evaluate(() => {
-        // @ts-expect-error injected global
-        window.init();
+      // @ts-expect-error injected global
+      window.init();
 
-        // @ts-expect-error injected global
-        const globalState = window.getState();
-        // @ts-expect-error injected global
-        return window.makeExpectedDocStructure([
-          ...globalState.allEls.values(),
-        ]);
-      });
+      // @ts-expect-error injected global
+      const globalState = window.getState();
+      // @ts-expect-error injected global
+      return window.makeExpectedDocStructure([...globalState.allEls.values()]);
+    });
 
-      expect(result).toEqual(engineDoc);
-      await page.close();
-      await browser.close();
-    }
-  );
+    expect(result).toEqual(engineDoc);
+  });
 });
 
 describe("addElements", () => {
   test.each(masters)(
     "should add elements to the engine",
-    async ({ playwrightBlueprint, engineDoc, fluidData, breakpoints }) => {
-      const { page, browser } = await initPlaywrightPage(playwrightBlueprint);
-
+    async ({ index, engineDoc, fluidData, breakpoints }) => {
+      const { page } = (await playwrightPages)[index];
       const result = await page.evaluate(
         ({ fluidData, breakpoints }) => {
           // @ts-expect-error injected global
-          const allEls = window.getAllEls();
+          const allEls = window.runtimeTestCases.addElsIndex.allEls;
 
+          // @ts-expect-error injected global
+          window.resetState();
           // @ts-expect-error injected global
           window.initEngineState(breakpoints, fluidData);
 
@@ -59,8 +54,6 @@ describe("addElements", () => {
       );
 
       expect(result).toEqual(engineDoc);
-      await page.close();
-      await browser.close();
     }
   );
 });

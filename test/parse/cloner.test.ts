@@ -1,6 +1,4 @@
 import { describe, test, it, expect } from "vitest";
-import { realProjectsData, initPlaywrightPage } from "../golden-state/init";
-import eauDeParfumDocClone from "../golden-state/eau-de-parfum/parse/docClone";
 import {
   cloneMediaRule,
   cloneStyleRule,
@@ -12,31 +10,27 @@ import {
   cloneMediaRuleUnitTests as cloneMediaRuleUnitTestsEauDeParfum,
   shortHandTests as shortHandTestsEauDeParfum,
 } from "../golden-state/eau-de-parfum/parse/cloner";
+import eauDeParfumMaster from "../golden-state/eau-de-parfum/master";
+import { playwrightPages } from "../golden-state/vitest.init";
 
-const docClones = [eauDeParfumDocClone].map((docClone, index) => ({
-  index,
-  docClone,
-}));
+const masters = [eauDeParfumMaster];
 
 describe(
   "cloneDocument",
   () => {
-    test.each(docClones)(
+    test.each(masters)(
       "should clone the browser document",
       async ({ index, docClone }) => {
-        const { page, browser } = await initPlaywrightPage(
-          realProjectsData[index]
-        );
-
+        const { page } = (await playwrightPages)[index];
         const clonedDocument = await page.evaluate(() => {
-          // window.cloneDocument is injected in setup
+          // @ts-expect-error injected global
+          window.resetState();
+
           // @ts-expect-error injected global
           return window.cloneDocument(document);
         });
 
         expect(clonedDocument).toEqual(docClone);
-        await page.close();
-        await browser.close();
       }
     );
   },

@@ -1,4 +1,4 @@
-import { JSDOMDocs } from "../../init";
+import { JSDOMDocs } from "../../vitest.init";
 import eauDeParfumDocClone from "./docClone";
 
 const cloneStyleRuleTests = [

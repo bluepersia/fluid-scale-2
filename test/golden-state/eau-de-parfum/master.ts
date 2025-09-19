@@ -1,12 +1,7 @@
 import docClone from "./parse/docClone";
 import { batchedStructure } from "./parse/batchedStructure";
 import fluidData from "./parse/parserResult";
-import { realProjectsData } from "../init";
-import {
-  doc as engineDoc,
-  allIds as allIdsEngine,
-  makeFluidPropertiesDoc,
-} from "./engine/doc";
+import { doc as engineDoc, makeFluidPropertiesDoc } from "./runtime/engine/doc";
 import { Master } from "../../index.types";
 
 const master: Master = {
@@ -15,9 +10,8 @@ const master: Master = {
   globalBaselineWidth: 375,
   batchedStructure,
   fluidData,
-  playwrightBlueprint: realProjectsData[0],
+  index: 0,
   engineDoc,
-  allIdsEngine,
   makeFluidPropertiesDoc,
 };
 

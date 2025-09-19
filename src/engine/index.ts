@@ -2,7 +2,7 @@ import { ElWState, FluidData } from "../index.types";
 import { FluidProperty } from "./fluidProperty";
 import { GlobalState, IFluidProperty } from "./index.types";
 
-const state: GlobalState = {
+let state: GlobalState = {
   breakpoints: [],
   allEls: new Map(),
   fluidData: {},
@@ -10,6 +10,18 @@ const state: GlobalState = {
 
 function getState() {
   return { ...state };
+}
+
+function newState() {
+  return {
+    breakpoints: [],
+    allEls: new Map(),
+    fluidData: {},
+  };
+}
+
+function resetState() {
+  state = newState();
 }
 
 function initEngineState(breakpoints: number[], fluidData: FluidData) {
@@ -98,4 +110,5 @@ export {
   initEngineState,
   makeFluidPropertiesFromAnchor,
   addElementToState,
+  resetState,
 };
