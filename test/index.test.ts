@@ -1,12 +1,25 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import eauDeParfumMaster from "./golden-state/eau-de-parfum/master";
-import { playwrightPages } from "./golden-state/vitest.init";
+import {
+  initPlaywrightPages,
+  teardownPlaywrightPages,
+} from "./golden-state/vitest.init";
+import { PlaywrightPage } from "./index.types";
 
 const masters = [eauDeParfumMaster];
 
+let playwrightPages: PlaywrightPage[];
+beforeAll(async () => {
+  playwrightPages = await initPlaywrightPages();
+});
+
+afterAll(async () => {
+  await teardownPlaywrightPages(playwrightPages);
+});
+
 describe("init", () => {
   test.each(masters)("should init the engine", async ({ engineDoc, index }) => {
-    const { page } = (await playwrightPages)[index];
+    const { page } = playwrightPages[index];
     const result = await page.evaluate(() => {
       // @ts-expect-error injected global
       window.resetState();
@@ -28,7 +41,7 @@ describe("addElements", () => {
   test.each(masters)(
     "should add elements to the engine",
     async ({ index, engineDoc, fluidData, breakpoints }) => {
-      const { page } = (await playwrightPages)[index];
+      const { page } = playwrightPages[index];
       const result = await page.evaluate(
         ({ fluidData, breakpoints }) => {
           // @ts-expect-error injected global

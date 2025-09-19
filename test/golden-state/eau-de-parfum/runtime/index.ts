@@ -1,5 +1,6 @@
 import {
   AddElsEngineTestCase,
+  DocStructure,
   MakeFluidPropertiesAnchorTestCase,
 } from "../../runtime/engine/index.types";
 import {
@@ -10,6 +11,15 @@ import {
   makeAddElsEngineTestCase,
   makeMakeFluidPropertiesAnchorTestCases,
 } from "./engine";
+
+const doc: DocStructure = {
+  "1": ["max-width"],
+  "4": ["padding-top", "padding-right", "padding-bottom", "padding-left"],
+  "5": ["margin-bottom"],
+  "6": ["margin-bottom"],
+  "7": ["margin-bottom"],
+  "11": ["margin-top"],
+};
 
 function makeRuntimeTestCases(pageIndex: number): RuntimeTestCases {
   const addElsIndex: AddElsIndexTestCase = {
@@ -28,4 +38,4 @@ function makeRuntimeTestCases(pageIndex: number): RuntimeTestCases {
   };
 }
 
-export { makeRuntimeTestCases };
+export { makeRuntimeTestCases, doc };

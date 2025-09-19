@@ -6,6 +6,13 @@ import {
   MakeFluidPropertiesDoc,
 } from "./golden-state/runtime/engine/index.types";
 import { BatchedStructure } from "./parse/index.types";
+import { RunTimeTestCaseCounter } from "./golden-state/runtime/index.types";
+
+type PlaywrightPage = {
+  page: Page;
+  browser: Browser;
+  runtimeTestCaseCounter: RunTimeTestCaseCounter;
+};
 
 type Master = {
   docClone: DocumentClone;
@@ -15,7 +22,6 @@ type Master = {
   fluidData: FluidData;
   index: number;
   engineDoc: DocStructure;
-  makeFluidPropertiesDoc: MakeFluidPropertiesDoc;
 };
 
-export { Master };
+export { Master, PlaywrightPage };

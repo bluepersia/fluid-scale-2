@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { generateJSDOMDocument } from "../../src/parse/json-builder";
 import { RunTimeTestCaseCounter } from "./runtime/index.types";
+import { PlaywrightPage } from "../index.types";
 
 console.log("init.ts loaded");
 
@@ -26,16 +27,8 @@ const JSDOMDocs = realProjectsData.map(({ htmlFilePath }) => {
   return generateJSDOMDocument([finalPath]);
 });
 
-let playwrightPages: Promise<
-  {
-    page: Page;
-    browser: Browser;
-    runtimeTestCaseCounter: RunTimeTestCaseCounter;
-  }[]
->;
-
-async function setup() {
-  playwrightPages = Promise.all(
+async function initPlaywrightPages(): Promise<PlaywrightPage[]> {
+  return await Promise.all(
     realProjectsData.map(async ({ htmlFilePath, addCss }, index) => {
       const finalPath = path.resolve(__dirname, htmlFilePath, "index.html");
       const browser = await chromium.launch();
@@ -98,20 +91,13 @@ async function setup() {
   );
 }
 
-async function teardown() {
-  for (const { page, browser } of await playwrightPages) {
+async function teardownPlaywrightPages(
+  playwrightPages: { page: Page; browser: Browser }[]
+) {
+  for (const { page, browser } of playwrightPages) {
     await page.close(); // close page first
     await browser.close(); // then close browser
   }
 }
 
-export default async function () {
-  await setup();
-  return async () => {
-    await teardown();
-  };
-}
-
-await setup();
-
-export { JSDOMDocs, PlaywrightBlueprint, playwrightPages };
+export { JSDOMDocs, initPlaywrightPages, teardownPlaywrightPages };
