@@ -1,3 +1,5 @@
+import { IFluidProperty } from "./engine/index.types";
+
 type FluidRange = {
   minValue: FluidValue[][];
   maxValue: FluidValue[][];
@@ -14,10 +16,7 @@ type FluidValueSingle = {
 type FluidData = {
   [anchor: string]: {
     [selector: string]: {
-      [property: string]: {
-        metaData: FluidPropertyMetaData;
-        ranges: FluidRange[];
-      };
+      [property: string]: FluidPropertyData;
     };
   };
 };
@@ -27,10 +26,22 @@ type FluidPropertyMetaData = {
   property: string;
 };
 
+type FluidPropertyData = {
+  metaData: FluidPropertyMetaData;
+  ranges: FluidRange[];
+};
+
+type ElWState = {
+  el: HTMLElement;
+  fluidProperties: IFluidProperty[];
+};
+
 export type {
   FluidRange,
   FluidValue,
   FluidValueSingle,
   FluidPropertyMetaData,
   FluidData,
+  FluidPropertyData,
+  ElWState,
 };

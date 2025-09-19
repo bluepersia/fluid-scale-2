@@ -1,5 +1,5 @@
 type DocumentClone = {
-  stylesheets: StylesheetClone[];
+  styleSheets: StylesheetClone[];
 };
 
 type StylesheetClone = {

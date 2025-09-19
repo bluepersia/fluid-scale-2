@@ -177,11 +177,11 @@ const explicitProps = new Map<string, string>([
 
 function cloneDocument(doc: Document): DocumentClone {
   const docClone: DocumentClone = {
-    stylesheets: [],
+    styleSheets: [],
   };
 
-  for (const stylesheet of filterAccessibleStyleSheets(doc.styleSheets)) {
-    docClone.stylesheets.push(cloneStylesheet(stylesheet));
+  for (const styleSheet of filterAccessibleStyleSheets(doc.styleSheets)) {
+    docClone.styleSheets.push(cloneStylesheet(styleSheet));
   }
   return docClone;
 }
@@ -228,10 +228,11 @@ function cloneStyleRule(styleRule: CSSStyleRule): StyleRuleClone {
         const shorthandName = explicitProps.get(property) as string;
         let shorthand = shorthandCache.get(shorthandName);
         if (!shorthand) {
-          shorthand = handleShorthand(
-            shorthandName,
-            styleRule.style.getPropertyValue(shorthandName)
-          );
+          const shorthandValue =
+            styleRule.style.getPropertyValue(shorthandName);
+          if (!shorthandValue) continue;
+
+          shorthand = handleShorthand(shorthandName, shorthandValue);
           shorthandCache.set(shorthandName, shorthand);
         }
         style[property] = normalizeZero(shorthand[property]);

@@ -1,4 +1,4 @@
-import { FluidData } from "../../../src/index.types";
+import { FluidData } from "../../../../src/index.types";
 
 const fluidData: FluidData = {
   ".product-card": {

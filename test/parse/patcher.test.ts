@@ -8,7 +8,7 @@ import {
   processRuleBatches,
   processStyleRule,
   splitSelectors,
-} from "../src/parse/patcher/patcher";
+} from "../../src/parse/patcher/patcher";
 import {
   ruleBatchesTests as eauDeParfumRuleBatchesTests,
   ruleBatchTests as eauDeParfumRuleBatchTests,
@@ -17,7 +17,7 @@ import {
   matchingRuleTests as eauDeParfumMatchingRuleTests,
   makeFluidRangeTests as eauDeParfumMakeFluidRangeTests,
   applyFluidRangeTests as eauDeParfumApplyFluidRangeTests,
-} from "./golden-state/eau-de-parfum/patcher";
+} from "../golden-state/eau-de-parfum/parse/patcher";
 
 const splitSelectorsTests = [
   {

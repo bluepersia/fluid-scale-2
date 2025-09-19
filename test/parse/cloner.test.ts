@@ -1,42 +1,48 @@
-import { describe, test, it, expect } from "vitest";
-import { realProjectsData, initPlaywrightPage } from "./golden-state/init";
-import eauDeParfumDocClone from "./golden-state/eau-de-parfum/docClone";
+import { describe, test, it, expect, beforeAll, afterAll } from "vitest";
 import {
   cloneMediaRule,
   cloneStyleRule,
   handleShorthand,
-} from "../src/parse/cloner";
+} from "../../src/parse/cloner";
 import {
   cloneStyleRuleTests as cloneStyleRuleTestsEauDeParfum,
   cloneMediaRuleTests as cloneMediaRuleTestsEauDeParfum,
   cloneMediaRuleUnitTests as cloneMediaRuleUnitTestsEauDeParfum,
   shortHandTests as shortHandTestsEauDeParfum,
-} from "./golden-state/eau-de-parfum/cloner";
+} from "../golden-state/eau-de-parfum/parse/cloner";
+import eauDeParfumMaster from "../golden-state/eau-de-parfum/master";
+import {
+  initPlaywrightPages,
+  teardownPlaywrightPages,
+} from "../golden-state/vitest.init";
+import { PlaywrightPage } from "../index.types";
 
-const docClones = [eauDeParfumDocClone].map((docClone, index) => ({
-  index,
-  docClone,
-}));
+const masters = [eauDeParfumMaster];
 
+let playwrightPages: PlaywrightPage[];
+beforeAll(async () => {
+  playwrightPages = await initPlaywrightPages();
+});
+
+afterAll(async () => {
+  await teardownPlaywrightPages(playwrightPages);
+});
 describe(
   "cloneDocument",
   () => {
-    test.each(docClones)(
+    test.each(masters)(
       "should clone the browser document",
       async ({ index, docClone }) => {
-        const { page, browser } = await initPlaywrightPage(
-          realProjectsData[index]
-        );
-
+        const { page } = playwrightPages[index];
         const clonedDocument = await page.evaluate(() => {
-          // window.cloneDocument is injected in setup
+          // @ts-expect-error injected global
+          window.resetState();
+
           // @ts-expect-error injected global
           return window.cloneDocument(document);
         });
 
-        expect(clonedDocument).toMatchObject(docClone);
-        await page.close();
-        await browser.close();
+        expect(clonedDocument).toEqual(docClone);
       }
     );
   },

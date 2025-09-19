@@ -8,12 +8,12 @@ import {
   batchStyleSheet,
   parseStyleSheets,
   parseStyleSheet,
-} from "../src/parse/parse";
+} from "../../src/parse/parse";
 import {
   MediaRuleClone,
   StyleRuleClone,
   StylesheetClone,
-} from "../src/parse/cloner.types";
+} from "../../src/parse/cloner.types";
 import {
   parseCSSTests as parseCSSTestsEauDeParfum,
   perpareDocTests as perpareDocTestsEauDeParfum,
@@ -23,7 +23,7 @@ import {
   batchStyleSheetTest as batchStyleSheetTestEauDeParfum,
   parseStyleSheetsTests as parseStyleSheetsTestsEauDeParfum,
   parseStyleSheetTests as parseStyleSheetTestsEauDeParfum,
-} from "./golden-state/eau-de-parfum/parse";
+} from "../golden-state/eau-de-parfum/parse/parse";
 
 const parseCSSTests = [...parseCSSTestsEauDeParfum];
 
