@@ -10,9 +10,7 @@ export function makeExpectedDocStructure(elsWState: ElWState[]): DocStructure {
   const docStructure: DocStructure = {};
 
   for (const elWState of elsWState) {
-    docStructure[elWState.el.dataset.goldenId!] = elWState.fluidProperties.map(
-      (property) => property.metaData.property
-    );
+    docStructure[elWState.el.dataset.goldenId!] = elWState.fluidProperties;
   }
 
   return docStructure;

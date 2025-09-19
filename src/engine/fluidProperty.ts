@@ -3,9 +3,9 @@ import { IFluidProperty } from "./index.types";
 
 class FluidProperty implements IFluidProperty {
   metaData: FluidPropertyMetaData;
-  ranges: FluidRange[];
+  ranges: (FluidRange | null)[];
 
-  constructor(metaData: FluidPropertyMetaData, ranges: FluidRange[]) {
+  constructor(metaData: FluidPropertyMetaData, ranges: (FluidRange | null)[]) {
     this.metaData = metaData;
     this.ranges = ranges;
   }

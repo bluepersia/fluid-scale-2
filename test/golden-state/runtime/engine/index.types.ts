@@ -1,7 +1,11 @@
+import { FluidPropertyMetaData, FluidRange } from "../../../../src/index.types";
 import { AddElsIndexTestCase } from "../index.types";
 
 type DocStructure = {
-  [goldenId: string]: string[];
+  [goldenId: string]: {
+    metaData: FluidPropertyMetaData;
+    ranges: (FluidRange | null)[];
+  }[];
 };
 
 type MakeFluidPropertiesDoc = {

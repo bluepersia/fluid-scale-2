@@ -1,6 +1,11 @@
-import { ElWState, FluidData } from "../index.types";
+import { ElWState, FluidData, FluidRange } from "../index.types";
 import { FluidProperty } from "./fluidProperty";
-import { GlobalState, IFluidProperty } from "./index.types";
+import {
+  AddElementsParams,
+  GlobalState,
+  IFluidProperty,
+  MakeFluidPropertiesFromAnchorParams,
+} from "./index.types";
 
 let state: GlobalState = {
   breakpoints: [],
@@ -35,9 +40,9 @@ function addElementToState(elWState: ElWState) {
 
 function addElements(
   els: HTMLElement[],
-  allEls: Map<HTMLElement, ElWState>,
-  fluidData: FluidData
+  params: AddElementsParams
 ): ElWState[] {
+  const { allEls } = params;
   const toAdd: ElWState[] = [];
 
   for (const el of els) {
@@ -55,17 +60,17 @@ function addElements(
 
     for (const klass of classes) {
       fluidProperties.push(
-        ...makeFluidPropertiesFromAnchor(`.${klass}`, el, fluidData)
+        ...makeFluidPropertiesFromAnchor(`.${klass}`, el, params)
       );
     }
 
     if (el.id)
       fluidProperties.push(
-        ...makeFluidPropertiesFromAnchor(`#${el.id}`, el, fluidData)
+        ...makeFluidPropertiesFromAnchor(`#${el.id}`, el, params)
       );
 
     fluidProperties.push(
-      ...makeFluidPropertiesFromAnchor(el.tagName.toLowerCase(), el, fluidData)
+      ...makeFluidPropertiesFromAnchor(el.tagName.toLowerCase(), el, params)
     );
 
     if (fluidProperties.length <= 0) continue;
@@ -79,8 +84,9 @@ function addElements(
 function makeFluidPropertiesFromAnchor(
   anchor: string,
   el: HTMLElement,
-  fluidData: FluidData
+  params: MakeFluidPropertiesFromAnchorParams
 ): IFluidProperty[] {
+  const { fluidData, breakpoints } = params;
   const anchorData = fluidData[anchor];
 
   if (!anchorData) return [];
@@ -93,10 +99,14 @@ function makeFluidPropertiesFromAnchor(
     const selectorData = anchorData[selector];
 
     for (const propertyData of Object.values(selectorData)) {
-      const fluidProperty = new FluidProperty(
-        propertyData.metaData,
-        propertyData.ranges
+      const ranges: (FluidRange | null)[] = new Array(breakpoints.length).fill(
+        null
       );
+      for (const range of propertyData.ranges) {
+        const bpIndex = range.minIndex;
+        ranges[bpIndex] = range;
+      }
+      const fluidProperty = new FluidProperty(propertyData.metaData, ranges);
       fluidProperties.push(fluidProperty);
     }
   }

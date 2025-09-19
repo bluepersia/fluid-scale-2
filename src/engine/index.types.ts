@@ -13,7 +13,23 @@ type GlobalState = {
 
 type IFluidProperty = {
   metaData: FluidPropertyMetaData;
-  ranges: FluidRange[];
+  ranges: (FluidRange | null)[];
 };
 
-export type { GlobalState, IFluidProperty };
+type AddElementsParams = {
+  allEls: Map<HTMLElement, ElWState>;
+  fluidData: FluidData;
+  breakpoints: number[];
+};
+
+type MakeFluidPropertiesFromAnchorParams = Pick<
+  AddElementsParams,
+  "fluidData" | "breakpoints"
+>;
+
+export type {
+  GlobalState,
+  IFluidProperty,
+  AddElementsParams,
+  MakeFluidPropertiesFromAnchorParams,
+};

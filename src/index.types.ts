@@ -16,10 +16,7 @@ type FluidValueSingle = {
 type FluidData = {
   [anchor: string]: {
     [selector: string]: {
-      [property: string]: {
-        metaData: FluidPropertyMetaData;
-        ranges: FluidRange[];
-      };
+      [property: string]: FluidPropertyData;
     };
   };
 };
@@ -27,6 +24,11 @@ type FluidData = {
 type FluidPropertyMetaData = {
   order: number;
   property: string;
+};
+
+type FluidPropertyData = {
+  metaData: FluidPropertyMetaData;
+  ranges: FluidRange[];
 };
 
 type ElWState = {
@@ -40,5 +42,6 @@ export type {
   FluidValueSingle,
   FluidPropertyMetaData,
   FluidData,
+  FluidPropertyData,
   ElWState,
 };

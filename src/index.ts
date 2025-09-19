@@ -13,7 +13,7 @@ function addElements(els: Node[]) {
   ) as HTMLElement[];
 
   const state = getState();
-  const toAdd = addElementsEngine(htmlEls, state.allEls, state.fluidData);
+  const toAdd = addElementsEngine(htmlEls, state);
 
   for (const elAdd of toAdd) {
     addElementToState(elAdd);
