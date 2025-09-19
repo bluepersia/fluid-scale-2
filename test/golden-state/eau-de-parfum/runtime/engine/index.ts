@@ -2,7 +2,6 @@ import { AddElsIndexTestCase } from "../../../runtime/index.types";
 import {
   AddElsEngineTestCase,
   MakeFluidPropertiesAnchorTestCase,
-  MakeFluidPropertiesDoc,
 } from "../../../runtime/engine/index.types";
 
 function makeAddElsEngineTestCase(
@@ -13,22 +12,6 @@ function makeAddElsEngineTestCase(
     masterIndex: addElsIndexTestCase.masterIndex,
   };
 }
-
-const makeFluidPropertiesFixture: MakeFluidPropertiesDoc = {
-  "1": { ".product-card": ["max-width"] },
-  "4": {
-    ".product-card__content": [
-      "padding-top",
-      "padding-right",
-      "padding-bottom",
-      "padding-left",
-    ],
-  },
-  "5": { ".product-card__category": ["margin-bottom"] },
-  "6": { ".product-card__title": ["margin-bottom"] },
-  "7": { ".product-card__description": ["margin-bottom"] },
-  "11": { ".product-card__button": ["margin-top"] },
-};
 
 function makeMakeFluidPropertiesAnchorTestCases(
   addElsTestCase: AddElsEngineTestCase
@@ -41,7 +24,6 @@ function makeMakeFluidPropertiesAnchorTestCases(
         anchor: `.${klass}`,
         el,
         masterIndex: addElsTestCase.masterIndex,
-        fixture: makeFluidPropertiesFixture,
       });
     }
 
@@ -50,7 +32,6 @@ function makeMakeFluidPropertiesAnchorTestCases(
         anchor: `#${el.id}`,
         el,
         masterIndex: addElsTestCase.masterIndex,
-        fixture: makeFluidPropertiesFixture,
       });
     }
 
@@ -58,7 +39,6 @@ function makeMakeFluidPropertiesAnchorTestCases(
       anchor: el.tagName.toLowerCase(),
       el,
       masterIndex: addElsTestCase.masterIndex,
-      fixture: makeFluidPropertiesFixture,
     });
   }
 

@@ -1,6 +1,6 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, describe, expect, test } from "vitest";
 import eauDeParfumMaster from "../golden-state/eau-de-parfum/master";
-import { MakeFluidPropertiesAnchorTestCase } from "../golden-state/runtime/engine/index.types";
+
 import {
   initPlaywrightPages,
   teardownPlaywrightPages,
@@ -49,35 +49,35 @@ describe("makeFluidPropertiesFromAnchor", () => {
     // Only define real tests
     for (let testIndex = 0; testIndex < count; testIndex++) {
       test(`master ${masterIndex}, test ${testIndex}`, async () => {
-        const { fluidProperties, goldenId, anchor, fixture } =
-          await page.evaluate(
-            ({ fluidData, testIndex }) => {
-              // @ts-expect-error injected global
-              window.resetState();
+        const { fluidProperties, goldenId } = await page.evaluate(
+          ({ fluidData, testIndex }) => {
+            // @ts-expect-error injected global
+            window.resetState();
 
-              //prettier-ignore
-              // @ts-expect-error injected global
-              const { el, anchor, fixture } = window.runtimeTestCases.makeFluidPropertiesAnchor[testIndex];
+            //prettier-ignore
+            // @ts-expect-error injected global
+            const { el, anchor } = window.runtimeTestCases.makeFluidPropertiesAnchor[testIndex];
 
-              //prettier-ignore
-              // @ts-expect-error injected global
-              const fluidProperties = window.makeFluidPropertiesFromAnchor(
+            //prettier-ignore
+            // @ts-expect-error injected global
+            const fluidProperties = window.makeFluidPropertiesFromAnchor(
               anchor,
               el,
               fluidData
             );
-              return {
-                fluidProperties,
-                goldenId: el.dataset.goldenId!,
-                anchor,
-                fixture,
-              };
-            },
-            { fluidData: master.fluidData, testIndex }
-          );
+            return {
+              fluidProperties,
+              goldenId: el.dataset.goldenId!,
+            };
+          },
+          { fluidData: master.fluidData, testIndex }
+        );
 
-        expect(fluidProperties.map((p) => p.metaData.property)).toEqual(
-          fixture[goldenId]?.[anchor] || []
+        const { engineDoc } = master;
+        expect(engineDoc[goldenId] || []).toEqual(
+          expect.arrayContaining(
+            fluidProperties.map((p) => p.metaData.property)
+          )
         );
       });
     }

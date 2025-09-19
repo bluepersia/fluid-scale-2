@@ -16,7 +16,6 @@ type MakeFluidPropertiesAnchorTestCase = Pick<
   AddElsIndexTestCase,
   "masterIndex"
 > & {
-  fixture: MakeFluidPropertiesDoc;
   anchor: string;
   el: HTMLElement;
 };
